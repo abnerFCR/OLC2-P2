@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
 import { Funcion } from 'src/interprete/Instrucciones/Funcion';
 import { TranslationWidth } from '@angular/common';
 import { DeclaracionType } from 'src/interprete/Instrucciones/DeclaracionType.js';
-
+import { parserT } from '../traduccionc3d/Grammar/Grammar.js';
 
 @Component({
   selector: 'app-root',
@@ -26,7 +26,10 @@ export class AppComponent {
   title = 'interprete-web';
   entrada = prueba.prueba;
   traduccion = "";
-  consola_salida = ""
+  consola_salida = "";
+
+  txt_c3d="";
+  txt_c3d_optimizado="";
   constructor(private router:Router){
 
   }
@@ -41,6 +44,14 @@ export class AppComponent {
   options_salida: any = {
     lineNumbers: true,
     theme: 'mbo',
+    lineWrapping: true,
+    indentWithTabs: true,
+    mode: 'javascript',
+    styleActiveLine: true
+  };
+  options_c3d: any = {
+    lineNumbers: true,
+    theme: 'abcdef',
     lineWrapping: true,
     indentWithTabs: true,
     mode: 'javascript',
@@ -171,7 +182,6 @@ export class AppComponent {
   
   }
 
-
   public imprimirErrores() {
     for (const err of errores) {
       this.consola_salida = this.consola_salida + "-----------------------**** ERROR ****-----------------------------------------\n";
@@ -181,12 +191,14 @@ export class AppComponent {
     this.consola_salida = this.consola_salida + cuadro_texto.salida;
   }
 
-
   public reportes(){
     this.router.navigate(['/reportes']);
   }
 
-
+  public generarC3D(){
+    const abc = parserT.parse("console.log(5);");
+    this.txt_c3d = abc;
+  }
 
 }
 

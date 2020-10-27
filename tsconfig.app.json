@@ -11,7 +11,7 @@
   ],
   "include": [
     "src/**/*.d.ts",
-    "src/interprete/**/*.ts"
-    
+    "src/interprete/**/*.ts",
+    "src/traduccionc3d/**/*.ts"
   ]
 }
