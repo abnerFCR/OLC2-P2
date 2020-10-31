@@ -53,7 +53,7 @@ export class Suma extends Expresion {
                         generador.addExpresion(tempAux,tempAux,'1','+');
                         generador.addSetStack(tempAux,derecha.getValor());
                         generador.addSiguienteEntorno(entorno.size);
-                        generador.addCall('native_concat_str_dbl');
+                        generador.addCall('nativa_conca_number_string');
                         generador.addGetStack(temp,'p');
                         generador.addAnteriorEntorno(entorno.size);
                         return new Retorno(temp, true, new Type(Types.STRING));

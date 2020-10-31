@@ -209,6 +209,7 @@ export class AppComponent {
     nativas.nativa_imprimir_string();
     nativas.nativa_conca_string_string();
     nativas.nativa_conca_number_string(); 
+    nativas.nativa_conca_string_number();
     console.log(ast);
     //TODO ahorita todas las instrucciones caen en main, cuando haga funciones y struct hay que hacer una corrida para meterlas y traducirlas
     //TODO y otra corrida para traducir todo lo que esta fuera y meterlo en el main 
