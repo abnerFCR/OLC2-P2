@@ -13,18 +13,19 @@ export class PrimitivoL extends Expresion {
         super(linea, columna);
         this.tipo = tipo;
         this.valor = valor;
+        console.log(this);
     }
 
-    public compilar(enviorement: Entorno): Retorno {
+    public compilar(entorno: Entorno): Retorno {
         switch (this.tipo) {
             case Types.NUMBER:
                 return new Retorno(this.valor,false,new Type(this.tipo));
             case Types.BOOLEAN:
-                const generator = Generador.getInstancia();
+                const generador = Generador.getInstancia();
                 const retorno = new Retorno('',false,new Type(this.tipo));
-                this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generator.newEtiqueta() : this.etiquetaVerdadero;
-                this.etiquetaFalso = this.etiquetaFalso == '' ? generator.newEtiqueta() : this.etiquetaFalso;
-                this.valor ? generator.addGoto(this.etiquetaVerdadero) : generator.addGoto(this.etiquetaFalso);
+                this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generador.newEtiqueta() : this.etiquetaVerdadero;
+                this.etiquetaFalso = this.etiquetaFalso == '' ? generador.newEtiqueta() : this.etiquetaFalso;
+                this.valor ? generador.addGoto(this.etiquetaVerdadero) : generador.addGoto(this.etiquetaFalso);
                 retorno.etiquetaVerdadero = this.etiquetaVerdadero;
                 retorno.etiquetaFalso = this.etiquetaFalso;
                 return retorno;

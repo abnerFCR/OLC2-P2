@@ -5,25 +5,32 @@ import { Retorno } from "../../Utils/Retorno";
 import { Generador } from "../../Generador/Generador";
 
 export class StringL extends Expresion {
-    private type: Types;
-    private value: string;
+    private tipo: Types;
+    private valor: any;
 
-    constructor(type: Types, value: string, line: number, column: number) {
-        super(line, column);
-        this.type = type;
-        this.value = value;
+    constructor(tipo: Types, valor:any, linea: number, columna: number) {
+        super(linea, columna);
+        this.tipo = tipo;
+        this.valor = valor;
     }
 
-    public compilar(enviorement: Entorno): Retorno {
-        const generator = Generador.getInstancia();
-        const temp = generator.newTemporal();
-        generator.addExpresion(temp, 'h');
-        for (let i = 0; i < this.value.length; i++) {
-            generator.addSetHeap('h', this.value.charCodeAt(i));
-            generator.nextHeap();
+    public compilar(entorno: Entorno): Retorno {
+        const generador = Generador.getInstancia();
+        const temp = generador.newTemporal();
+        let valor_string = this.valor.slice(1, -1);
+        valor_string = valor_string.replaceAll('\\n', '\n');
+        valor_string = valor_string.replaceAll('\\r', '\r');
+        valor_string = valor_string.replaceAll('\\t', '\t');
+        valor_string = valor_string.replaceAll('\\"', '\"');
+        valor_string = valor_string.replaceAll("\\'", '\'');
+        valor_string = valor_string.replaceAll("\\\\", '\\');
+        generador.addExpresion(temp, 'h');
+        for (let i = 0; i < valor_string.length; i++) {
+            generador.addSetHeap('h', valor_string.charCodeAt(i));
+            generador.nextHeap();
         }
-        generator.addSetHeap('h', '-1');
-        generator.nextHeap();
-        return new Retorno(temp, true, new Type(this.type, 'String'));
+        generador.addSetHeap('h', '-1');
+        generador.nextHeap();
+        return new Retorno(temp, true, new Type(this.tipo, 'String'));
     }
 }

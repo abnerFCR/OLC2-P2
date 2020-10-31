@@ -1,4 +1,5 @@
 import { Entorno } from "../TablaSimbolos/Entorno";
+import { Nativas } from './Nativas';
 
 export class Generador{
 
@@ -6,11 +7,12 @@ export class Generador{
     private temporal : number;
     private etiqueta : number;
     private codigo : string[];
+    private acceso :number;
     private almacenamientoTemp : Set<string>; //almacena los nombre de todas las variables temporales
     isFunc = '';
 
     private constructor(){
-        this.temporal = this.etiqueta = 0;
+        this.temporal = this.acceso = this.etiqueta = 0;
         this.codigo = new Array();
         this.almacenamientoTemp = new Set();
     }
@@ -18,7 +20,13 @@ export class Generador{
     public static getInstancia(){
         return this.generador || (this.generador = new this());
     }
-
+    public limpiarGenerador(){
+        this.temporal = 0;
+        this.etiqueta = 0;
+        this.codigo = [];
+        this.almacenamientoTemp.clear();
+        this.isFunc='';
+    }
     //obtenemos el array con los temporales
     public getAlmacenamientoTemp(){
         return this.almacenamientoTemp;
@@ -58,6 +66,11 @@ export class Generador{
         return temp;
     }
 
+    public newAcceso() : string{
+        const acceso = 'A' + this.acceso++
+        return acceso;
+    }
+
     //genera una etiqueta
     public newEtiqueta() : string{
         return 'L' + this.etiqueta++;
@@ -90,22 +103,22 @@ export class Generador{
 
     //obtiene lo que esta guardado en una posicion en el HEAP: 'objetivo = Heap[index];'
     public addGetHeap(objetivo : any, index: any){
-        this.codigo.push(`${this.isFunc}${objetivo} = Heap[${index}];`);
+        this.codigo.push(`${this.isFunc}${objetivo} = Heap[(int)${index}];`);
     }
 
     //poner una informacion en alguna posicion del HEAP: 'Heap[index]=valor;'
     public addSetHeap(index: any, valor : any){
-        this.codigo.push(`${this.isFunc}Heap[${index}] = ${valor};`);
+        this.codigo.push(`${this.isFunc}Heap[(int)${index}] = ${valor};`);
     }
     
     //obtiene lo que esta guardado en una posicion en el STACK: 'objetivo = Stack[index];'
     public addGetStack(objetivo : any, index: any){
-        this.codigo.push(`${this.isFunc}${objetivo} = Stack[${index}];`);
+        this.codigo.push(`${this.isFunc}${objetivo} = Stack[(int)${index}];`);
     }
 
     //poner una informacion en alguna posicion del STACK: 'Stack[index]=valor;'
     public addSetStack(index: any, valor : any){
-        this.codigo.push(`${this.isFunc}Stack[${index}] = ${valor};`);
+        this.codigo.push(`${this.isFunc}Stack[(int)${index}] = ${valor};`);
     }
 
     //poner instruccion que reserva el espacio suficiente en el stack para que almacenemos las variables de un nuevo entorno
@@ -119,15 +132,14 @@ export class Generador{
     }
 
     //a;adir llamada 
-    //TODO corregir porque asi no se llaman las funciones en C pero solo hay que poner 
     public addCall(id: string){
-        this.codigo.push(`${this.isFunc}call ${id};`);
+        this.codigo.push(`${this.isFunc} ${id}();`);
     }
 
     //esta funcion comienza un procedimiento por el momento solo esta  'public void id(){'
     //TODO todos los tipos aunque creo que no se puede por ser el codigo de 3 direcciones
     public addBegin(id: string, tipo:string="void"){
-        this.codigo.push(`\npublic ${tipo} ${id} () {`);
+        this.codigo.push(`\n${tipo} ${id} {`);
     }
 
     //se a;ade final del procedimiento
@@ -143,7 +155,7 @@ export class Generador{
 
     //esta funcion añade un print al codigo final con salto de linea 'print(formato, valor)'
     public addPrintln(formato: string, valor: any){
-        this.codigo.push(`${this.isFunc}printf("%${formato}\n",${valor});`);
+        this.codigo.push(`${this.isFunc}printf("%${formato}\\n",${valor});`);
     }
 
     //a;ade instrucciones al codigo final para imprimir un true
@@ -226,5 +238,32 @@ export class Generador{
             this.addComentario('Finaliza recuperado de temporales');
             enviorement.size = posicion;
         }
+    }
+    public addReturnVoid(){
+        this.codigo.push("return;");
+    }
+    public addReturnValor(valor:string){
+        this.codigo.push("return "+valor+";");
+    }
+
+    public addEncabezado(){
+        this.codigo.unshift('double Stack[100000];');
+        this.codigo.unshift('double Heap[100000];');
+        this.codigo.unshift('int p = 0;');
+        this.codigo.unshift('int h = 0;');
+        let temporalesString:string = 'double ';
+        for(let i=0;i<this.temporal-1;i++){
+            temporalesString = temporalesString + ('T'+ i ) +'=0, ';
+        }
+        temporalesString = temporalesString + ('T'+(this.temporal-1))+'=0;';
+        this.codigo.unshift(temporalesString);
+        let accesosString:string = 'int ';
+        for(let i=0;i<this.acceso-1;i++){
+            accesosString = accesosString + ('A'+ i ) +'=0, ';
+        }
+        accesosString = accesosString + ('A'+(this.acceso-1))+'=0;';
+        this.codigo.unshift(accesosString);
+        this.codigo.unshift('#include<stdio.h>');
+        this.codigo.unshift('#include<math.h>');
     }
 }

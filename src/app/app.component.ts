@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { parser } from '../interprete/Grammar/Grammar.js';
 import { parser3 } from '../interprete/Grammar/Grammar3.js';
-import { Entorno } from '../interprete/Simbolo/Entorno';
+//import { Entorno } from '../interprete/Simbolo/Entorno';
 import { cuadro_texto, prueba } from "../interprete/Abstracto/Retorno";
 import { errores } from '../interprete/Errores/Errores';
 import "codemirror/lib/codemirror";
@@ -14,6 +14,9 @@ import { Funcion } from 'src/interprete/Instrucciones/Funcion';
 import { TranslationWidth } from '@angular/common';
 import { DeclaracionType } from 'src/interprete/Instrucciones/DeclaracionType.js';
 import { parserT } from '../traduccionc3d/Grammar/Grammar.js';
+import { Generador } from '../traduccionc3d/Generador/Generador';
+import { Nativas } from 'src/traduccionc3d/Generador/Nativas.js';
+import { Entorno } from 'src/traduccionc3d/TablaSimbolos/Entorno.js';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +27,7 @@ import { parserT } from '../traduccionc3d/Grammar/Grammar.js';
 export class AppComponent {
 
   title = 'interprete-web';
-  entrada = prueba.prueba;
+  entrada = 'console.log(3.5+"hola");';
   traduccion = "";
   consola_salida = "";
 
@@ -66,6 +69,7 @@ export class AppComponent {
     styleActiveLine: true
   };
 
+  
   public ejecutar() {
     cuadro_texto.entrada = this.entrada.toString();
     errores.length = 0;
@@ -74,7 +78,7 @@ export class AppComponent {
     cuadro_texto.salida = "";
     cuadro_texto.simbolos =[];
     const ast = parser.parse(this.entrada.toString());
-
+    /*
     for(const instr of ast){
       try{
         if(instr instanceof Funcion){
@@ -99,7 +103,7 @@ export class AppComponent {
     }
     console.log(env);
     this.imprimirErrores();
-  
+    */
   }
 
   public traducir(){
@@ -114,7 +118,7 @@ export class AppComponent {
     const textoTraducido = parser3.parse(this.entrada.toString());
     
     const ast = parser.parse(textoTraducido);
-
+/*
     for(const instr of ast){
       try{
         if(instr instanceof Funcion){
@@ -142,9 +146,10 @@ export class AppComponent {
     //console.log(textoTraducido);
     this.traduccion = textoTraducido;
     //this.imprimirErrores();
-
+*/
   }
 
+  
   public ejecutarTraduccion() {
     cuadro_texto.entrada = this.entrada.toString();
     cuadro_texto.traducir = "";
@@ -154,7 +159,7 @@ export class AppComponent {
     cuadro_texto.salida = "";
     cuadro_texto.simbolos =[];
     const ast = parser.parse(this.traduccion.toString());
-
+    /*
     for(const instr of ast){
       try{
         if(instr instanceof Funcion){
@@ -179,7 +184,7 @@ export class AppComponent {
     }
     console.log(env);
     this.imprimirErrores();
-  
+    */
   }
 
   public imprimirErrores() {
@@ -196,8 +201,32 @@ export class AppComponent {
   }
 
   public generarC3D(){
-    const abc = parserT.parse("console.log(5);");
-    this.txt_c3d = abc;
+    const ast = parserT.parse(this.entrada);
+    let env:Entorno = new Entorno(null);
+    console.log(env);
+    Generador.getInstancia().limpiarGenerador();
+    let nativas  = new Nativas();
+    nativas.nativa_imprimir_string();
+    nativas.nativa_conca_string_string();
+    nativas.nativa_conca_number_string(); 
+    console.log(ast);
+    //TODO ahorita todas las instrucciones caen en main, cuando haga funciones y struct hay que hacer una corrida para meterlas y traducirlas
+    //TODO y otra corrida para traducir todo lo que esta fuera y meterlo en el main 
+    Generador.getInstancia().addBegin('main()','void');
+    for(const instr of ast){
+      try{
+        instr.compilar(env);
+      }catch{
+        //console.log("hay error");
+        errores.push();
+      }
+    }
+    Generador.getInstancia().addEnd();
+    console.log(errores);
+    Generador.getInstancia().addEncabezado();
+    console.log(Generador.getInstancia().getCodigo());
+    this.txt_c3d = Generador.getInstancia().getCodigo();
+    
   }
 
 }

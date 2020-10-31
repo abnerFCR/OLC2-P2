@@ -1,6 +1,11 @@
 %{
     const { errores } =require('../../interprete/Errores/Errores');
     const { Error_ } =require('../../interprete/Errores/Error');
+    const { Suma } = require('../Expresion/Aritmetico/Suma');
+    const { Types, Type } = require('../Utils/Type');
+    const { PrimitivoL } = require('../Expresion/Literal/Primitivo');
+    const { StringL } = require('../Expresion/Literal/String');
+    const { Imprimir } = require('../Instruccion/Funciones/Imprimir');
 %}
 
 %lex
@@ -144,7 +149,7 @@ Instrucciones
     }
     |Instruccion
     {
-        $$=$1;
+        $$=[$1];
     }
 ;
 
@@ -330,7 +335,7 @@ TiposFuncion
 Imprimir
     :CONSOLELOG '(' ListaExpr ')' ';'
     {
-        $$="printf(\"%d\","+$3+");";
+        $$ = new Imprimir($3, true, @1.first_line, @1.first_column);
     }
 ;
 
@@ -643,6 +648,7 @@ Tipos
 Expr
     : Expr '+' Expr
     {
+        $$ = new Suma($1,$3,@1.first_line,@1.first_column);
     }       
     | Expr '-' Expr
     {
@@ -707,25 +713,31 @@ F   : '(' Expr ')'
     }
     | DECIMAL
     { 
+        $$=new PrimitivoL(Types.NUMBER, $1, @1.first_line, @1.first_column);
     }
     | NUMBER
     { 
-        $$=$1;
+        $$=new PrimitivoL(Types.NUMBER, $1, @1.first_line, @1.first_column);
     }
     | STRING
     {
+        $$ = new StringL(Types.STRING, $1, @1.first_line, @1.first_column);
     }
     | STRING2
     {
+        $$ = new StringL(Types.STRING, $1, @1.first_line, @1.first_column);
     }
     | STRING3
     {
+        $$ = new StringL(Types.STRING, $1, @1.first_line, @1.first_column);
     }
     | TRUE
     {
+        $$=new PrimitivoL(Types.BOOLEAN, $1, @1.first_line, @1.first_column);
     }
     | FALSE
     {
+        $$=new PrimitivoL(Types.BOOLEAN, $1, @1.first_line, @1.first_column);
     }
     |NuevoAcceso
     {

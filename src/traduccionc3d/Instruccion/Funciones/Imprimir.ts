@@ -20,7 +20,7 @@ export class Imprimir extends Instruccion {
         const generador = Generador.getInstancia();
         switch (valor.tipo.nombreTipo) {
             case Types.NUMBER:
-                generador.addPrint('d', valor.getValor());
+                generador.addPrint('f', valor.getValor());
                 break;
             case Types.BOOLEAN:
                 const templabel = generador.newEtiqueta();
@@ -31,11 +31,12 @@ export class Imprimir extends Instruccion {
                 generador.addImprimirFalse();
                 generador.addEtiqueta(templabel);
                 break;
-                //TODO nativa imprimir string
+                //TODO el size lo imprimi undefined
             case Types.STRING:
+                console.log(entorno.size);
                 generador.addSiguienteEntorno(entorno.size);
                 generador.addSetStack('p', valor.getValor());
-                generador.addCall('native_print_str');
+                generador.addCall('nativa_imprimir_string');
                 generador.addAnteriorEntorno(entorno.size);
                 break;
             case Types.NULL:
