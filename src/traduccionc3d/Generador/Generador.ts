@@ -6,7 +6,7 @@ export class Generador{
     private static generador: Generador;
     private temporal : number;
     private etiqueta : number;
-    private codigo : string[];
+    public codigo : string[];
     private acceso :number;
     private almacenamientoTemp : Set<string>; //almacena los nombre de todas las variables temporales
     isFunc = '';
@@ -61,7 +61,7 @@ export class Generador{
 
     //genera un temporal y lo guarda en la lista de temporales
     public newTemporal() : string{
-        const temp = 'T' + this.temporal++
+        const temp = 'T' + this.temporal++;
         this.almacenamientoTemp.add(temp);
         return temp;
     }
@@ -133,7 +133,7 @@ export class Generador{
 
     //a;adir llamada 
     public addCall(id: string){
-        this.codigo.push(`${this.isFunc} ${id}();`);
+        this.codigo.push(`${this.isFunc}${id}();`);
     }
 
     //esta funcion comienza un procedimiento por el momento solo esta  'public void id(){'
@@ -247,8 +247,8 @@ export class Generador{
     }
 
     public addEncabezado(){
-        this.codigo.unshift('double Stack[100000];');
-        this.codigo.unshift('double Heap[100000];');
+        this.codigo.unshift('double Stack[200000];');
+        this.codigo.unshift('double Heap[200000];');
         this.codigo.unshift('int p = 0;');
         this.codigo.unshift('int h = 0;');
         let temporalesString:string = 'double ';

@@ -2,10 +2,18 @@
     const { errores } =require('../../interprete/Errores/Errores');
     const { Error_ } =require('../../interprete/Errores/Error');
     const { Suma } = require('../Expresion/Aritmetico/Suma');
+    const { Resta } = require('../Expresion/Aritmetico/Resta');
+    const { Inverso } = require('../Expresion/Aritmetico/Inverso');
+    const { Residuo } = require('../Expresion/Aritmetico/Residuo');
+    const { Multiplicacion } = require('../Expresion/Aritmetico/Multiplicacion');
+    const { IgualIgual } = require('../Expresion/Relacional/Igual');
+    const { Division } = require('../Expresion/Aritmetico/Division');
+    const { Potencia } = require('../Expresion/Aritmetico/Potencia');
     const { Types, Type } = require('../Utils/Type');
     const { PrimitivoL } = require('../Expresion/Literal/Primitivo');
     const { StringL } = require('../Expresion/Literal/String');
     const { Imprimir } = require('../Instruccion/Funciones/Imprimir');
+
 %}
 
 %lex
@@ -145,7 +153,8 @@ Init
 Instrucciones
     : Instrucciones Instruccion
     {
-
+        $1.push($2);
+        $$ = $1;
     }
     |Instruccion
     {
@@ -627,11 +636,12 @@ ValorArreglo
 ListaExpr
     :ListaExpr ',' Expr
     {
-
+        $1.push($3);
+        $$ = $1;
     }
     |Expr
     {
-        $$ = $1;
+        $$ = [$1];
     }
 ;
 
@@ -652,21 +662,27 @@ Expr
     }       
     | Expr '-' Expr
     {
+        $$ = new Resta($1,$3,@1.first_line,@1.first_column);
     }
     | Expr '*' Expr
     { 
+        $$ = new Multiplicacion($1,$3,@1.first_line,@1.first_column);
     }       
     | Expr '/' Expr
     {
+        $$ = new Division($1,$3,@1.first_line,@1.first_column);
     }
     | Expr '**' Expr
     {
+        $$ = new Potencia($1,$3,@1.first_line,@1.first_column);
     }
     | Expr '%' Expr
     {
+        $$ = new Residuo($1,$3,@1.first_line,@1.first_column);
     }
     | '-' Expr
     {
+        $$ = new Inverso($2,@1.first_line,@1.first_column);
     }
     | Expr '++'
     {
@@ -697,6 +713,7 @@ Expr
     }
     | Expr '==' Expr
     {
+        $$ = new IgualIgual($1,$3,@1.first_line,@1.first_column);
     }
     | Expr '!=' Expr
     { 
@@ -710,6 +727,7 @@ Expr
 
 F   : '(' Expr ')'
     { 
+        $$ = $2;
     }
     | DECIMAL
     { 
@@ -733,11 +751,11 @@ F   : '(' Expr ')'
     }
     | TRUE
     {
-        $$=new PrimitivoL(Types.BOOLEAN, $1, @1.first_line, @1.first_column);
+        $$=new PrimitivoL(Types.BOOLEAN, true, @1.first_line, @1.first_column);
     }
     | FALSE
     {
-        $$=new PrimitivoL(Types.BOOLEAN, $1, @1.first_line, @1.first_column);
+        $$=new PrimitivoL(Types.BOOLEAN, false, @1.first_line, @1.first_column);
     }
     |NuevoAcceso
     {
@@ -745,6 +763,7 @@ F   : '(' Expr ')'
     }
     |NULL 
     {
+        $$=new PrimitivoL(Types.NULL, -1, @1.first_line, @1.first_column);
     }
     |ID '(' ListaExpr ')' 
     {

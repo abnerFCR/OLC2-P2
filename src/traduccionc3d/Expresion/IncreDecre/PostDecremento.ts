@@ -5,39 +5,39 @@ import { Retorno } from "../../Utils/Retorno";
 import { Types } from "../../Utils/Type";
 import { Generador } from "../../Generador/Generador";
 
-export class PostDecrement extends Expresion {
-    private access: Expresion;
+export class PostDecremento extends Expresion {
+    private acceso: Expresion;
 
-    constructor(access: Expresion, linea: number, columna: number) {
+    constructor(acceso: Expresion, linea: number, columna: number) {
         super(linea, columna);
-        this.access = access;
+        this.acceso = acceso;
     }
 
-    compilar(enviorement: Entorno): Retorno {
-        const access = this.access.compilar(enviorement);
-        const symbol = access.simbolo;
+    compilar(entorno: Entorno): Retorno {
+        const acceso = this.acceso.compilar(entorno);
+        const simbolo = acceso.simbolo;
         const generator = Generador.getInstancia();
-        if(symbol == null) throw new Error(this.linea,this.columna,'Semantico','-- no aplicable aqui');
-        switch (access.tipo.nombreTipo) {
+        if(simbolo == null) throw new Error(this.linea,this.columna,'Semantico','-- no aplicable aqui');
+        switch (acceso.tipo.nombreTipo) {
             case Types.NUMBER:
                 const temp = generator.newTemporal();
                 const tempaux = generator.newTemporal(); generator.liberarTemporal(tempaux);
-                if(symbol?.isGlobal){
-                    generator.addGetStack(temp,symbol.posicion);
+                if(simbolo?.isGlobal){
+                    generator.addGetStack(temp,simbolo.posicion);
                     generator.addExpresion(tempaux,temp,'1','-');
-                    generator.addSetStack(symbol.posicion,tempaux);
+                    generator.addSetStack(simbolo.posicion,tempaux);
                 }
-                else if(symbol?.isHeap){
-                    generator.addGetHeap(temp,access.getValor());
+                else if(simbolo?.isHeap){
+                    generator.addGetHeap(temp,acceso.getValor());
                     generator.addExpresion(tempaux,temp,'1','-');
-                    generator.addSetHeap(access.getValor(),tempaux);
+                    generator.addSetHeap(acceso.getValor(),tempaux);
                 }
                 else{
-                    generator.addGetStack(temp,access.getValor());
+                    generator.addGetStack(temp,acceso.getValor());
                     generator.addExpresion(tempaux,temp,'1','-');
-                    generator.addSetStack(access.getValor(),tempaux);
+                    generator.addSetStack(acceso.getValor(),tempaux);
                 }
-                return new Retorno(temp,true,symbol.tipo);
+                return new Retorno(temp,true,simbolo.tipo);
             default:
                 break;
         }

@@ -6,30 +6,30 @@ import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Error } from "../../Utils/Error";
 
 export class Residuo extends Expresion{
-    private left: Expresion;
-    private right: Expresion;
+    private izquierda: Expresion;
+    private derecha: Expresion;
 
-    constructor(left: Expresion, right: Expresion, line: number, column: number) {
-        super(line, column);
-        this.left = left;
-        this.right = right;
+    constructor(izquierda: Expresion, derecha: Expresion, linea: number, columna: number) {
+        super(linea, columna);
+        this.izquierda = izquierda;
+        this.derecha = derecha;
     }
 
     public compilar(enviorement: Entorno): Retorno {
-        const left = this.left.compilar(enviorement);
-        const right = this.right.compilar(enviorement);
-        const generator = Generador.getInstancia();
-        const temp = generator.newTemporal();
-        switch (left.tipo.nombreTipo) {
+        const izquierda = this.izquierda.compilar(enviorement);
+        const derecha = this.derecha.compilar(enviorement);
+        const generador = Generador.getInstancia();
+        const temp = generador.newTemporal();
+        switch (izquierda.tipo.nombreTipo) {
             case Types.NUMBER:
-                switch (right.tipo.nombreTipo) {
+                switch (derecha.tipo.nombreTipo) {
                     case Types.NUMBER:
-                        generator.addExpresion(temp, left.getValor(), right.getValor(), '%');
-                        return new Retorno(temp, true, left.tipo);
+                        generador.addCodigo(`${temp} = fmod(${izquierda.getValor()}, ${derecha.getValor()});`);
+                        return new Retorno(temp, true, izquierda.tipo);
                     default:
                         break;
                 }
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede modular ${left.tipo.nombreTipo} % ${right.tipo.nombreTipo}`);
+        throw new Error(this.linea, this.columna, 'Semantico', `No se puede modular ${izquierda.tipo.nombreTipo} % ${derecha.tipo.nombreTipo}`);
     }
 }

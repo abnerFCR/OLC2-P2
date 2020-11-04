@@ -6,30 +6,30 @@ import { Types, Type } from "../../Utils/Type";
 import { Retorno } from "../../Utils/Retorno";
 
 export class Resta extends Expresion {
-    private left: Expresion;
-    private right: Expresion;
+    private izquierda: Expresion;
+    private derecha: Expresion;
 
-    constructor(left: Expresion, right: Expresion, line: number, column: number) {
-        super(line, column);
-        this.left = left;
-        this.right = right;
+    constructor(izquierda: Expresion, derecha: Expresion, linea: number, columna: number) {
+        super(linea, columna);
+        this.izquierda = izquierda;
+        this.derecha = derecha;
     }
 
-    public compilar(enviorement: Entorno): Retorno {
-        const left = this.left.compilar(enviorement);
-        const right = this.right.compilar(enviorement);
-        const generator = Generador.getInstancia();
-        const temp = generator.newTemporal();
-        switch (left.tipo.nombreTipo) {
+    public compilar(entorno: Entorno): Retorno {
+        const izquierda = this.izquierda.compilar(entorno);
+        const derecha = this.derecha.compilar(entorno);
+        const generador = Generador.getInstancia();
+        const temp = generador.newTemporal();
+        switch (izquierda.tipo.nombreTipo) {
             case Types.NUMBER:
-                switch (right.tipo.nombreTipo) {
+                switch (derecha.tipo.nombreTipo) {
                     case Types.NUMBER:
-                        generator.addExpresion(temp, left.getValor(), right.getValor(), '-');
-                        return new Retorno(temp, true, left.tipo);
+                        generador.addExpresion(temp, izquierda.getValor(), derecha.getValor(), '-');
+                        return new Retorno(temp, true, izquierda.tipo);
                     default:
                         break;
                 }
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede restar ${left.tipo.nombreTipo} - ${right.tipo.nombreTipo}`);
+        throw new Error(this.linea, this.columna, 'Semantico', `No se puede restar ${izquierda.tipo.nombreTipo} - ${derecha.tipo.nombreTipo}`);
     }
 }

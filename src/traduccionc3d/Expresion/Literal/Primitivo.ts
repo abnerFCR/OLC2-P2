@@ -7,7 +7,7 @@ import { Error } from "../../Utils/Error";
 
 export class PrimitivoL extends Expresion {
     private tipo: Types;
-    private valor: any;
+    public valor: any;
 
     constructor(tipo: Types, valor: any, linea: number, columna: number) {
         super(linea, columna);
@@ -23,8 +23,10 @@ export class PrimitivoL extends Expresion {
             case Types.BOOLEAN:
                 const generador = Generador.getInstancia();
                 const retorno = new Retorno('',false,new Type(this.tipo));
+                //const retorno = new Retorno(this.valor,false,new Type(this.tipo));
                 this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generador.newEtiqueta() : this.etiquetaVerdadero;
                 this.etiquetaFalso = this.etiquetaFalso == '' ? generador.newEtiqueta() : this.etiquetaFalso;
+                //
                 this.valor ? generador.addGoto(this.etiquetaVerdadero) : generador.addGoto(this.etiquetaFalso);
                 retorno.etiquetaVerdadero = this.etiquetaVerdadero;
                 retorno.etiquetaFalso = this.etiquetaFalso;
