@@ -2,10 +2,10 @@ import { Instruccion } from "../../Abstracto/Instruccion";
 import { Parametro } from "../../Utils/Parametro";
 import { Type, Types } from "../../Utils/Type";
 import { Entorno } from "../../TablaSimbolos/Entorno";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Generador } from "../../Generador/Generador";
 
-export class FunctionSt extends Instruccion{
+export class FuncionSt extends Instruccion{
     id: string;
     parametros: Array<Parametro>;
     tipo: Type;
@@ -28,7 +28,7 @@ export class FunctionSt extends Instruccion{
             this.validarTipo(entorno);
             const idUnico = this.idUnico(entorno);
             if(!entorno.addFuncion(this,idUnico))
-                throw new Error(this.linea,this.columna,'Semantico',`Ya existe una funcion con el id: ${this.id}`);
+                throw new Error_(this.linea,this.columna,'Semantico',`Ya existe una funcion con el id: ${this.id}`);
             return;
         }
 
@@ -45,9 +45,10 @@ export class FunctionSt extends Instruccion{
             });
             generator.limpiarAlmacenamientoTemp();
             generator.isFunc = '\t';
-            generator.addBegin(symbolFunc.idUnico);
+            generator.addBegin(symbolFunc.idUnico+'()');
             this.cuerpo.compilar(newEntorno);
             generator.addEtiqueta(etiquetaRetorno);
+            generator.addReturnVoid();
             generator.addEnd();
             generator.isFunc = '';
             generator.setAlmacenamientoTemp(almacenamientoTemp);
@@ -58,11 +59,11 @@ export class FunctionSt extends Instruccion{
         const set = new Set<string>();
         this.parametros.forEach((param)=>{
             if(set.has(param.id.toLowerCase()))
-                throw new Error(this.linea,this.columna,'Semantico',`Ya existe un parametro con el id ${param.id}`);
+                throw new Error_(this.linea,this.columna,'Semantico',`Ya existe un parametro con el id ${param.id}`);
             if(param.tipo.nombreTipo == Types.STRUCT ){
                 const struct = entorno.getStruct(param.tipo.tipoIdStruct);
                 if(!struct)
-                    throw new Error(this.linea,this.columna,'Semantico',`No existe el struct ${param.tipo.tipoIdStruct}`);
+                    throw new Error_(this.linea,this.columna,'Semantico',`No existe el struct ${param.tipo.tipoIdStruct}`);
                 param.tipo.struct = struct;
             }
             set.add(param.id.toLowerCase());
@@ -73,7 +74,7 @@ export class FunctionSt extends Instruccion{
         if(this.tipo.nombreTipo == Types.STRUCT){
             const struct = entorno.getStruct(this.tipo.tipoIdStruct);
             if(!struct)
-                throw new Error(this.linea,this.columna,'Semantico',`No existe el struct ${this.tipo.tipoIdStruct}`);
+                throw new Error_(this.linea,this.columna,'Semantico',`No existe el struct ${this.tipo.tipoIdStruct}`);
             this.tipo.struct = struct;
         }
     }

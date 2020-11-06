@@ -1,5 +1,5 @@
 import { Expresion } from "../../Abstracto/Expresion";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Utils/Retorno";
 import { Generador } from "../../Generador/Generador";
@@ -147,6 +147,6 @@ export class IgualIgual extends Expresion {
                 }
             default:
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede ${izquierda.tipo.nombreTipo} == ${derecha?.tipo.nombreTipo}`);
+        throw new Error_(this.linea, this.columna, 'Semantico', `No se puede ${izquierda.tipo.nombreTipo} == ${derecha?.tipo.nombreTipo}`);
     }
 }

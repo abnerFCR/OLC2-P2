@@ -1,7 +1,8 @@
+import { errores } from 'src/interprete/Errores/Errores';
 import { Instruccion } from "../../Abstracto/Instruccion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 
-export class CuerpoInstruccion extends Instruccion {
+export class Statement extends Instruccion {
     private instrucciones: Array<Instruccion> | null;
 
     constructor(instructions: Array<Instruccion> | null, linea: number, columna: number) {
@@ -11,12 +12,13 @@ export class CuerpoInstruccion extends Instruccion {
 
     compilar(entorno: Entorno): any {
         const newEnv = entorno.actualFunc == null ? new Entorno(entorno) : entorno;
-        this.instrucciones?.forEach((instruction)=>{
+        console.log(newEnv);
+        this.instrucciones?.forEach((instruction) => {
             try {
                 instruction.compilar(newEnv);
             } catch (error) {
-                //TODO hacer push del error a la lista de errores
-                console.log(error);
+                errores.push(error);
+                //                console.log(error);
             }
         });
     }

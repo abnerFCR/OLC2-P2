@@ -2,8 +2,9 @@ import { Instruccion } from "../../Abstracto/Instruccion";
 import { Expresion } from "../../Abstracto/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Types } from "../../Utils/Type";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Generador } from "../../Generador/Generador";
+
 
 export class While extends Instruccion {
     private condicion: Expresion;
@@ -32,6 +33,6 @@ export class While extends Instruccion {
             generador.addComentario('Finaliza while');
             return;
         }
-        throw new Error(this.linea,this.columna,'Semantico',`La condicion no es booleana: ${condition?.tipo.nombreTipo}`);
+        throw new Error_(this.linea,this.columna,'Semantico',`La condicion no es booleana: ${condition?.tipo.nombreTipo}`);
     }
 }

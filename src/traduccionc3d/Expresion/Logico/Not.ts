@@ -3,7 +3,7 @@ import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Utils/Retorno";
 import { Generador } from "../../Generador/Generador";
 import { Types } from "../../Utils/Type";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 
 export class Not extends Expresion {
     private value: Expresion;
@@ -28,6 +28,6 @@ export class Not extends Expresion {
             retorno.etiquetaFalso = this.etiquetaFalso;
             return retorno;
         }
-        throw new Error(this.linea,this.columna,'Semantico',`No se puede Not del tipo ${value.tipo.nombreTipo}`);
+        throw new Error_(this.linea,this.columna,'Semantico',`No se puede Not del tipo ${value.tipo.nombreTipo}`);
     }
 }

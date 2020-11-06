@@ -2,7 +2,7 @@ import { Expresion } from "../../Abstracto/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Utils/Retorno";
 import { Generador } from "../../Generador/Generador";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Types } from "../../Utils/Type";
 import { Simbolo } from "../../TablaSimbolos/Simbolo";
 
@@ -20,7 +20,7 @@ export class AsignacionId extends Expresion {
         const generator = Generador.getInstancia();
         if (this.anterior == null) {
             const symbol = enviorement.getVariable(this.id);
-            if (symbol == null) throw new Error(this.linea, this.columna, 'Semantico', `No existe la variable ${this.id}`);
+            if (symbol == null) throw new Error_(this.linea, this.columna, 'Semantico', `No existe la variable ${this.id}`);
 
             if (symbol.isGlobal) {
                 return new Retorno(symbol.posicion + '', false, symbol.tipo, symbol);
@@ -35,11 +35,11 @@ export class AsignacionId extends Expresion {
             const anterior = this.anterior.compilar(enviorement);
             const symStruct = anterior.tipo.struct;
             if (anterior.tipo.nombreTipo != Types.STRUCT)
-                throw new Error(this.linea, this.columna, 'Semantico', `Acceso no valido para el tipo ${anterior.tipo.nombreTipo}`);
+                throw new Error_(this.linea, this.columna, 'Semantico', `Acceso no valido para el tipo ${anterior.tipo.nombreTipo}`);
 
             const attribute = symStruct?.getAtributo(this.id) || anterior.tipo.struct?.getAtributo(this.id);
             if (attribute == undefined || attribute.valor == null)
-                throw new Error(this.linea, this.columna, 'Semantico', `El struct ${symStruct?.id} no tiene el atributo ${this.id}`);
+                throw new Error_(this.linea, this.columna, 'Semantico', `El struct ${symStruct?.id} no tiene el atributo ${this.id}`);
 
             const tempAux = generator.newTemporal(); generator.liberarTemporal(tempAux);
             const temp = generator.newTemporal();

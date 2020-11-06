@@ -1,5 +1,5 @@
 import { Type } from "../Utils/Type";
-import { FunctionSt } from "../Instruccion/Funciones/FunctionSt";
+import { FuncionSt } from "../Instruccion/Funciones/FuncionSt";
 import { Parametro } from "../Utils/Parametro";
 
 export class SimboloFuncion {
@@ -9,7 +9,7 @@ export class SimboloFuncion {
     size: number;
     parametros: Array<Parametro>;
 
-    constructor(funcion: FunctionSt,idUnico: string) {
+    constructor(funcion: FuncionSt,idUnico: string) {
         this.tipo = funcion.tipo;
         this.id = funcion.id;
         this.size = funcion.parametros.length;

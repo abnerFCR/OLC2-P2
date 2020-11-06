@@ -1,6 +1,6 @@
 import { Expresion } from "../../Abstracto/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Retorno } from "../../Utils/Retorno";
 import { Types } from "../../Utils/Type";
 import { Generador } from "../../Generador/Generador";
@@ -17,7 +17,7 @@ export class PostDecremento extends Expresion {
         const acceso = this.acceso.compilar(entorno);
         const simbolo = acceso.simbolo;
         const generator = Generador.getInstancia();
-        if(simbolo == null) throw new Error(this.linea,this.columna,'Semantico','-- no aplicable aqui');
+        if(simbolo == null) throw new Error_(this.linea,this.columna,'Semantico','-- no aplicable aqui');
         switch (acceso.tipo.nombreTipo) {
             case Types.NUMBER:
                 const temp = generator.newTemporal();
@@ -41,6 +41,6 @@ export class PostDecremento extends Expresion {
             default:
                 break;
         }
-        throw new Error(this.linea, this.columna, 'Semantico', 'Aun no lo hago :(');
+        throw new Error_(this.linea, this.columna, 'Semantico', 'Aun no lo hago :(');
     }
 }

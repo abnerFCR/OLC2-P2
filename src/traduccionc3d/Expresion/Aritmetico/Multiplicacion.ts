@@ -3,7 +3,7 @@ import { Generador } from "../../Generador/Generador";
 import { Retorno } from "../../Utils/Retorno";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Type, Types } from "../../Utils/Type";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 
 export class Multiplicacion extends Expresion{
     private izquierda: Expresion;
@@ -30,6 +30,6 @@ export class Multiplicacion extends Expresion{
                         break;
                 }
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede multiplicar ${izquierda.tipo.nombreTipo} * ${derecha.tipo.nombreTipo}`);
+        throw new Error_(this.linea, this.columna, 'Semantico', `No se puede multiplicar ${izquierda.tipo.nombreTipo} * ${derecha.tipo.nombreTipo}`);
     }
 }

@@ -1,7 +1,7 @@
 import { Expresion } from "../../Abstracto/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Utils/Retorno";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { log, types } from "util";
 import { Generador } from "../../Generador/Generador";
 import { Types, Type } from "../../Utils/Type";
@@ -19,7 +19,7 @@ export class NuevoStruct extends Expresion {
         const symStruct = enviorement.buscarStruct(this.id);
         const generator = Generador.getInstancia();
         if (symStruct == null)
-            throw new Error(this.linea, this.columna, 'Semantico', `No existe el struct ${this.id} en este ambito`);
+            throw new Error_(this.linea, this.columna, 'Semantico', `No existe el struct ${this.id} en este ambito`);
         const temp = generator.newTemporal();
         generator.addExpresion(temp, 'h', '', '');
         //Llenar de valores por defecto

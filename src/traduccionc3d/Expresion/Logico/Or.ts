@@ -1,7 +1,7 @@
 import { Expresion } from "../../Abstracto/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Utils/Retorno";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Generador } from "../../Generador/Generador";
 import { Types } from "../../Utils/Type";
 
@@ -34,6 +34,6 @@ export class Or extends Expresion {
             retorno.etiquetaFalso = this.right.etiquetaFalso;
             return retorno;
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede Or: ${left.tipo.nombreTipo} || ${right.tipo.nombreTipo}`);
+        throw new Error_(this.linea, this.columna, 'Semantico', `No se puede Or: ${left.tipo.nombreTipo} || ${right.tipo.nombreTipo}`);
     }
 }

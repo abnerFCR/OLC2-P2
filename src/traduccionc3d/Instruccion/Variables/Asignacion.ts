@@ -3,7 +3,7 @@ import { Expresion } from "../../Abstracto/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Generador } from "../../Generador/Generador";
 import { Types } from "../../Utils/Type";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 
 export class Asignacion extends Instruccion {
     private objetivo: Expresion;
@@ -23,7 +23,7 @@ export class Asignacion extends Instruccion {
         const simbolo = objetivo.simbolo;
 
         if (!this.mismoTipo(objetivo.tipo, valor.tipo)) {
-            throw new Error(this.linea,this.columna,'Semantico','Tipos de dato diferentes');
+            throw new Error_(this.linea,this.columna,'Semantico','Tipos de dato diferentes');
         }
         if (simbolo?.isGlobal) {
             if (objetivo.tipo.nombreTipo == Types.BOOLEAN) {

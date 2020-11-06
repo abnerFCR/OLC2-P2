@@ -1,6 +1,6 @@
 import { Instruccion } from "../../Abstracto/Instruccion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Generador } from "../../Generador/Generador";
 
 export class Continue extends Instruccion{
@@ -11,7 +11,7 @@ export class Continue extends Instruccion{
 
     compilar(entorno: Entorno){
         if(entorno.continue == null){ 
-            throw new Error(this.linea,this.columna,'Semantico','Continue en un ambito incorrecto');
+            throw new Error_(this.linea,this.columna,'Semantico','Continue en un ambito incorrecto');
         }
         Generador.getInstancia().addGoto(entorno.continue);
     }

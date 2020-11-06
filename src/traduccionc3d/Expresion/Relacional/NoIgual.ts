@@ -1,32 +1,33 @@
 import { Expresion } from "../../Abstracto/Expresion";
 import { Generador } from "../../Generador/Generador";
 import { Retorno } from "../../Utils/Retorno";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Types, Type } from "../../Utils/Type";
 
-export class NotEquals extends Expresion{
-    private left: Expresion;
-    private right: Expresion;
+export class NoIgual extends Expresion{
+    private izquierda: Expresion;
+    private derecha: Expresion;
 
-    constructor(left: Expresion, right: Expresion, line: number, column: number) {
-        super(line, column);
-        this.left = left;
-        this.right = right; 
+    constructor(izquierda: Expresion, derecha: Expresion, linea: number, columna: number) {
+        super(linea, columna);
+        this.izquierda = izquierda;
+        this.derecha = derecha; 
     }
+    
 
-    compilar(enviorement: Entorno): Retorno {
-        const left = this.left.compilar(enviorement);
-        const right = this.right.compilar(enviorement);
-        const generator = Generador.getInstancia();
-        switch (left.tipo.nombreTipo) {
+    compilar(entorno: Entorno): Retorno {
+        const izquierda = this.izquierda.compilar(entorno);
+        const derecha = this.derecha.compilar(entorno);
+        const generador = Generador.getInstancia();
+        switch (izquierda.tipo.nombreTipo) {
             case Types.NUMBER:
-                switch (right.tipo.nombreTipo) {
+                switch (derecha.tipo.nombreTipo) {
                     case Types.NUMBER:
-                        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generator.newEtiqueta() : this.etiquetaVerdadero;
-                        this.etiquetaFalso = this.etiquetaFalso == '' ? generator.newEtiqueta() : this.etiquetaFalso;
-                        generator.addIf(left.getValor(), right.getValor(), '<>', this.etiquetaVerdadero);
-                        generator.addGoto(this.etiquetaFalso);
+                        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generador.newEtiqueta() : this.etiquetaVerdadero;
+                        this.etiquetaFalso = this.etiquetaFalso == '' ? generador.newEtiqueta() : this.etiquetaFalso;
+                        generador.addIf(izquierda.getValor(), derecha.getValor(), '!=', this.etiquetaVerdadero);
+                        generador.addGoto(this.etiquetaFalso);
                         const retorno = new Retorno('', false, new Type(Types.BOOLEAN));
                         retorno.etiquetaVerdadero = this.etiquetaVerdadero;
                         retorno.etiquetaFalso = this.etiquetaFalso;
@@ -35,33 +36,33 @@ export class NotEquals extends Expresion{
                         break;
                 }
             case Types.STRING:
-                switch (right.tipo.nombreTipo) {
+                switch (derecha.tipo.nombreTipo) {
                     case Types.STRING: {
-                        const temp = generator.newTemporal();
-                        const tempAux = generator.newTemporal(); generator.liberarTemporal(tempAux);
-                        generator.addExpresion(tempAux, 'p', enviorement.size + 1, '+');
-                        generator.addSetStack(tempAux, left.getValor());
-                        generator.addExpresion(tempAux, tempAux, '1', '+');
-                        generator.addSetStack(tempAux, right.getValor());
-                        generator.addSiguienteEntorno(enviorement.size);
-                        generator.addCall('native_compare_str_str');
-                        generator.addGetStack(temp, 'p');
-                        generator.addAnteriorEntorno(enviorement.size);
+                        const temp = generador.newTemporal();
+                        const tempAux = generador.newTemporal(); generador.liberarTemporal(tempAux);
+                        generador.addExpresion(tempAux, 'p', entorno.size + 1, '+');
+                        generador.addSetStack(tempAux, izquierda.getValor());
+                        generador.addExpresion(tempAux, tempAux, '1', '+');
+                        generador.addSetStack(tempAux, derecha.getValor());
+                        generador.addSiguienteEntorno(entorno.size);
+                        generador.addCall('nativa_comparar_string');
+                        generador.addGetStack(temp, 'p');
+                        generador.addAnteriorEntorno(entorno.size);
 
-                        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generator.newEtiqueta() : this.etiquetaVerdadero;
-                        this.etiquetaFalso = this.etiquetaFalso == '' ? generator.newEtiqueta() : this.etiquetaFalso;
-                        generator.addIf(temp, '1', '<>', this.etiquetaVerdadero);
-                        generator.addGoto(this.etiquetaFalso);
+                        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generador.newEtiqueta() : this.etiquetaVerdadero;
+                        this.etiquetaFalso = this.etiquetaFalso == '' ? generador.newEtiqueta() : this.etiquetaFalso;
+                        generador.addIf(temp, '1', '!=', this.etiquetaVerdadero);
+                        generador.addGoto(this.etiquetaFalso);
                         const retorno = new Retorno('', false, new Type(Types.BOOLEAN));
                         retorno.etiquetaVerdadero = this.etiquetaVerdadero;
                         retorno.etiquetaFalso = this.etiquetaFalso;
                         return retorno;
                     }
                     case Types.NULL: {
-                        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generator.newEtiqueta() : this.etiquetaVerdadero;
-                        this.etiquetaFalso = this.etiquetaFalso == '' ? generator.newEtiqueta() : this.etiquetaFalso;
-                        generator.addIf(left.getValor(), right.getValor(), '<>', this.etiquetaVerdadero);
-                        generator.addGoto(this.etiquetaFalso);
+                        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generador.newEtiqueta() : this.etiquetaVerdadero;
+                        this.etiquetaFalso = this.etiquetaFalso == '' ? generador.newEtiqueta() : this.etiquetaFalso;
+                        generador.addIf(izquierda.getValor(), derecha.getValor(), '!=', this.etiquetaVerdadero);
+                        generador.addGoto(this.etiquetaFalso);
                         const retorno = new Retorno('', false, new Type(Types.BOOLEAN));
                         retorno.etiquetaVerdadero = this.etiquetaVerdadero;
                         retorno.etiquetaFalso = this.etiquetaFalso;
@@ -71,15 +72,15 @@ export class NotEquals extends Expresion{
                         break;
                 }
             case Types.NULL:
-                switch (right.tipo.nombreTipo) {
+                switch (derecha.tipo.nombreTipo) {
                     case Types.STRING:
                     case Types.ARRAY:
                     case Types.STRUCT:
                     case Types.NULL:
-                        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generator.newEtiqueta() : this.etiquetaVerdadero;
-                        this.etiquetaFalso = this.etiquetaFalso == '' ? generator.newEtiqueta() : this.etiquetaFalso;
-                        generator.addIf(left.getValor(), right.getValor(), '<>', this.etiquetaVerdadero);
-                        generator.addGoto(this.etiquetaFalso);
+                        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generador.newEtiqueta() : this.etiquetaVerdadero;
+                        this.etiquetaFalso = this.etiquetaFalso == '' ? generador.newEtiqueta() : this.etiquetaFalso;
+                        generador.addIf(izquierda.getValor(), derecha.getValor(), '!=', this.etiquetaVerdadero);
+                        generador.addGoto(this.etiquetaFalso);
                         const retorno = new Retorno('', false, new Type(Types.BOOLEAN));
                         retorno.etiquetaVerdadero = this.etiquetaVerdadero;
                         retorno.etiquetaFalso = this.etiquetaFalso;
@@ -88,13 +89,13 @@ export class NotEquals extends Expresion{
                         break;    
                 }
             case Types.STRUCT:
-                switch (right.tipo.nombreTipo) {
+                switch (derecha.tipo.nombreTipo) {
                     case Types.STRUCT:                    
                     case Types.NULL:
-                        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generator.newEtiqueta() : this.etiquetaVerdadero;
-                        this.etiquetaFalso = this.etiquetaFalso == '' ? generator.newEtiqueta() : this.etiquetaFalso;
-                        generator.addIf(left.getValor(), right.getValor(), '<>', this.etiquetaVerdadero);
-                        generator.addGoto(this.etiquetaFalso);
+                        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generador.newEtiqueta() : this.etiquetaVerdadero;
+                        this.etiquetaFalso = this.etiquetaFalso == '' ? generador.newEtiqueta() : this.etiquetaFalso;
+                        generador.addIf(izquierda.getValor(), derecha.getValor(), '!=', this.etiquetaVerdadero);
+                        generador.addGoto(this.etiquetaFalso);
                         const retorno = new Retorno('', false, new Type(Types.BOOLEAN));
                         retorno.etiquetaVerdadero = this.etiquetaVerdadero;
                         retorno.etiquetaFalso = this.etiquetaFalso;
@@ -103,13 +104,13 @@ export class NotEquals extends Expresion{
                         break;
                 }
             case Types.ARRAY:
-                switch (right.tipo.nombreTipo) {
+                switch (derecha.tipo.nombreTipo) {
                     case Types.ARRAY:                    
                     case Types.NULL:
-                        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generator.newEtiqueta() : this.etiquetaVerdadero;
-                        this.etiquetaFalso = this.etiquetaFalso == '' ? generator.newEtiqueta() : this.etiquetaFalso;
-                        generator.addIf(left.getValor(), right.getValor(), '<>', this.etiquetaVerdadero);
-                        generator.addGoto(this.etiquetaFalso);
+                        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generador.newEtiqueta() : this.etiquetaVerdadero;
+                        this.etiquetaFalso = this.etiquetaFalso == '' ? generador.newEtiqueta() : this.etiquetaFalso;
+                        generador.addIf(izquierda.getValor(), derecha.getValor(), '!=', this.etiquetaVerdadero);
+                        generador.addGoto(this.etiquetaFalso);
                         const retorno = new Retorno('', false, new Type(Types.BOOLEAN));
                         retorno.etiquetaVerdadero = this.etiquetaVerdadero;
                         retorno.etiquetaFalso = this.etiquetaFalso;
@@ -119,6 +120,6 @@ export class NotEquals extends Expresion{
                 }
             default:
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede ${left.tipo.nombreTipo} != ${right.tipo.nombreTipo}`);
+        throw new Error_(this.linea, this.columna, 'Semantico', `No se puede ${izquierda.tipo.nombreTipo} != ${derecha.tipo.nombreTipo}`);
     }
 }

@@ -2,8 +2,8 @@ import { Instruccion } from "../../Abstracto/Instruccion";
 import { Expresion } from "../../Abstracto/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Types } from "../../Utils/Type";
-import { Error } from "../../Utils/Error";
 import { Generador } from "../../Generador/Generador";
+import { Error_ } from 'src/interprete/Errores/Error';
 
 export class If extends Instruccion {
     private condicion: Expresion;
@@ -38,6 +38,6 @@ export class If extends Instruccion {
             generator.addComentario('Fin If');
             return;
         }
-        throw new Error(this.linea,this.columna,'Semantico',`La condicion no es booleana: ${condicion?.tipo.nombreTipo}`);
+        throw new Error_(this.linea,this.columna,'Semantico',`La condicion no es booleana: ${condicion?.tipo.nombreTipo}`);
     }
 }

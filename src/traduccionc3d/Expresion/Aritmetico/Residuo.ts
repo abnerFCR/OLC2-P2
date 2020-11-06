@@ -3,7 +3,7 @@ import { Retorno } from "../../Utils/Retorno";
 import { Generador } from "../../Generador/Generador";
 import { Types, Type } from "../../Utils/Type";
 import { Entorno } from "../../TablaSimbolos/Entorno";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 
 export class Residuo extends Expresion{
     private izquierda: Expresion;
@@ -30,6 +30,6 @@ export class Residuo extends Expresion{
                         break;
                 }
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede modular ${izquierda.tipo.nombreTipo} % ${derecha.tipo.nombreTipo}`);
+        throw new Error_(this.linea, this.columna, 'Semantico', `No se puede modular ${izquierda.tipo.nombreTipo} % ${derecha.tipo.nombreTipo}`);
     }
 }

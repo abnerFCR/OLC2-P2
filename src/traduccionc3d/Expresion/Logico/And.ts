@@ -1,39 +1,39 @@
 import { Expresion } from "../../Abstracto/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Utils/Retorno";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Generador } from "../../Generador/Generador";
 import { Types } from "../../Utils/Type";
 
 export class And extends Expresion {
-    private left: Expresion;
-    private right: Expresion;
+    private izquierda: Expresion;
+    private derecha: Expresion;
 
-    constructor(left: Expresion, right: Expresion, line: number, column: number) {
-        super(line, column);
-        this.left = left;
-        this.right = right;
+    constructor(izquierda: Expresion, derecha: Expresion, line: number, columna: number) {
+        super(line, columna);
+        this.izquierda = izquierda;
+        this.derecha = derecha;
     }
 
-    compilar(enviorement: Entorno): Retorno {
+    compilar(entorno: Entorno): Retorno {
         const generator = Generador.getInstancia();
         this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generator.newEtiqueta() : this.etiquetaVerdadero;
         this.etiquetaFalso = this.etiquetaFalso == '' ? generator.newEtiqueta() : this.etiquetaFalso;
 
-        this.left.etiquetaVerdadero = generator.newEtiqueta();
-        this.right.etiquetaVerdadero = this.etiquetaVerdadero;
-        this.left.etiquetaFalso = this.right.etiquetaFalso = this.etiquetaFalso;
+        this.izquierda.etiquetaVerdadero = generator.newEtiqueta();
+        this.derecha.etiquetaVerdadero = this.etiquetaVerdadero;
+        this.izquierda.etiquetaFalso = this.derecha.etiquetaFalso = this.etiquetaFalso;
 
-        const left = this.left.compilar(enviorement);
-        generator.addEtiqueta(this.left.etiquetaVerdadero);
-        const right = this.right.compilar(enviorement);
+        const izquierda = this.izquierda.compilar(entorno);
+        generator.addEtiqueta(this.izquierda.etiquetaVerdadero);
+        const derecha = this.derecha.compilar(entorno);
 
-        if(left.tipo.nombreTipo == Types.BOOLEAN && right.tipo.nombreTipo == Types.BOOLEAN){
-            const retorno = new Retorno('',false,left.tipo);
+        if(izquierda.tipo.nombreTipo == Types.BOOLEAN && derecha.tipo.nombreTipo == Types.BOOLEAN){
+            const retorno = new Retorno('',false,izquierda.tipo);
             retorno.etiquetaVerdadero = this.etiquetaVerdadero;
-            retorno.etiquetaFalso = this.right.etiquetaFalso;
+            retorno.etiquetaFalso = this.derecha.etiquetaFalso;
             return retorno;
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede And: ${left.tipo.nombreTipo} && ${right.tipo.nombreTipo}`);
+        throw new Error_(this.linea, this.columna, 'Semantico', `No se puede And: ${izquierda.tipo.nombreTipo} && ${derecha.tipo.nombreTipo}`);
     }
 }

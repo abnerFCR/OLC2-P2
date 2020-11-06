@@ -3,59 +3,75 @@ import { Type, Types } from "../../Utils/Type";
 import { Expresion } from "../../Abstracto/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Generador } from "../../Generador/Generador";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
+import { PrimitivoL } from 'src/traduccionc3d/Expresion/Literal/Primitivo';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 export class Declaracion extends Instruccion {
     private tipo: Type;
     private listaId: Array<string>;
     private valor: Expresion;
+    private constante:boolean;
 
-    constructor(tipo: Type, listaId: Array<string>, valor: Expresion, linea: number, columna: number) {
+    constructor(constante:boolean, tipo: Type, listaId: Array<string>, valor: Expresion|null, linea: number, columna: number) {
         super(linea, columna);
         this.tipo = tipo;
         this.listaId = listaId;
-        this.valor = valor;
+        this.constante = constante;
+        if(valor == null){
+            if(tipo.nombreTipo == Types.NUMBER){
+                this.valor = new PrimitivoL(Types.NUMBER,0,linea,columna);
+            }else if(tipo.nombreTipo == Types.BOOLEAN){
+                this.valor = new PrimitivoL(Types.BOOLEAN, false,linea,columna);
+            }else{
+                this.valor = new PrimitivoL(Types.NULL,null,linea,columna);    
+            }
+        }else{
+            this.valor = valor;
+        }
     }
 
     compilar(entorno: Entorno): void {
-        const generator = Generador.getInstancia();
+        const generador = Generador.getInstancia();
         const valor = this.valor.compilar(entorno);
         if(!this.mismoTipo(this.tipo,valor.tipo)){
-            throw new Error(this.linea,this.columna,'Semantico',`Tipos de datos diferentes ${this.tipo.nombreTipo}, ${valor.tipo.nombreTipo}`);
+            throw new Error_(this.linea,this.columna,'Semantico',`Tipos de datos diferentes ${this.tipo.nombreTipo}, ${valor.tipo.nombreTipo}`);
         }
         this.validarTipo(entorno);
+
         this.listaId.forEach((id)=>{
-            const nuevaVariable = entorno.addVar(id,valor.tipo.nombreTipo == Types.NULL ? this.tipo : valor.tipo,false,false);
-            if(!nuevaVariable) throw new Error(this.linea,this.columna,'Semantico',`La variable: ${id} ya existe en este ambito;`);
+            // TODO por referencia es verdadero cuando son arreglos o tipos.  El ultimo parametro de .addVar
+            const nuevaVariable = entorno.addVar(id,valor.tipo.nombreTipo == Types.NULL ? this.tipo : valor.tipo,this.constante,false);
+            if(!nuevaVariable) throw new Error_(this.linea,this.columna,'Semantico',`La variable: ${id} ya existe en este ambito;`);
         
             if(nuevaVariable.isGlobal){
                 if(this.tipo.nombreTipo == Types.BOOLEAN){
-                    const templabel = generator.newEtiqueta();
-                    generator.addEtiqueta(valor.etiquetaVerdadero);
-                    generator.addSetStack(nuevaVariable.posicion,'1');
-                    generator.addGoto(templabel);
-                    generator.addEtiqueta(valor.etiquetaFalso);
-                    generator.addSetStack(nuevaVariable.posicion,'0');
-                    generator.addEtiqueta(templabel);
+                    const templabel = generador.newEtiqueta();
+                    generador.addEtiqueta(valor.etiquetaVerdadero);
+                    generador.addSetStack(nuevaVariable.posicion,'1');
+                    generador.addGoto(templabel);
+                    generador.addEtiqueta(valor.etiquetaFalso);
+                    generador.addSetStack(nuevaVariable.posicion,'0');
+                    generador.addEtiqueta(templabel);
                 }
                 else{
-                    generator.addSetStack(nuevaVariable.posicion,valor.getValor());
+                    generador.addSetStack(nuevaVariable.posicion,valor.getValor());
                 }
             }
             else{
-                const temp = generator.newTemporal(); generator.liberarTemporal(temp);
-                generator.addExpresion(temp,'p',nuevaVariable.posicion,'+');
+                const temp = generador.newTemporal(); generador.liberarTemporal(temp);
+                generador.addExpresion(temp,'p',nuevaVariable.posicion,'+');
                 if(this.tipo.nombreTipo == Types.BOOLEAN){
-                    const templabel = generator.newEtiqueta();
-                    generator.addEtiqueta(valor.etiquetaVerdadero);
-                    generator.addSetStack(temp,'1');
-                    generator.addGoto(templabel);
-                    generator.addEtiqueta(valor.etiquetaFalso);
-                    generator.addSetStack(temp,'0');
-                    generator.addEtiqueta(templabel);
+                    const templabel = generador.newEtiqueta();
+                    generador.addEtiqueta(valor.etiquetaVerdadero);
+                    generador.addSetStack(temp,'1');
+                    generador.addGoto(templabel);
+                    generador.addEtiqueta(valor.etiquetaFalso);
+                    generador.addSetStack(temp,'0');
+                    generador.addEtiqueta(templabel);
                 }
                 else{
-                    generator.addSetStack(temp,valor.getValor());
+                    generador.addSetStack(temp,valor.getValor());
                 }
             }
         });
@@ -65,7 +81,7 @@ export class Declaracion extends Instruccion {
         if(this.tipo.nombreTipo == Types.STRUCT){
             const struct = entorno.buscarStruct(this.tipo.tipoIdStruct);
             if(!struct)
-                throw new Error(this.linea,this.columna,'Semantico',`No existe el struct ${this.tipo.tipoIdStruct}`);
+                throw new Error_(this.linea,this.columna,'Semantico',`No existe el struct ${this.tipo.tipoIdStruct}`);
             this.tipo.struct = struct;
         }
     }

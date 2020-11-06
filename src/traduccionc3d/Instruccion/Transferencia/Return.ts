@@ -1,7 +1,7 @@
 import { Instruccion } from "../../Abstracto/Instruccion";
 import { Expresion } from "../../Abstracto/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Types, Type } from "../../Utils/Type";
 import { Generador } from "../../Generador/Generador";
 import { Retorno } from "../../Utils/Retorno";
@@ -20,10 +20,10 @@ export class Return extends Instruccion {
         const generator = Generador.getInstancia();
 
         if (symFunc == null)
-            throw new Error(this.linea, this.columna, 'Semantico', 'Return fuera de una funcion');
+            throw new Error_(this.linea, this.columna, 'Semantico', 'Return fuera de una funcion');
 
         if (!this.mismoTipo(symFunc.tipo, valor.tipo))
-            throw new Error(this.linea, this.columna, 'Semantico', `Se esperaba ${symFunc.tipo.nombreTipo} y se obtuvo ${valor.tipo.nombreTipo}`);
+            throw new Error_(this.linea, this.columna, 'Semantico', `Se esperaba ${symFunc.tipo.nombreTipo} y se obtuvo ${valor.tipo.nombreTipo}`);
 
         if(symFunc.tipo.nombreTipo == Types.BOOLEAN){
             const templabel = generator.newEtiqueta();

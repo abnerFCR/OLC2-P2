@@ -3,7 +3,7 @@ import { Generador } from "../../Generador/Generador";
 import { Retorno } from "../../Utils/Retorno";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Type, Types } from "../../Utils/Type";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 
 export class Inverso extends Expresion{
     private valor: Expresion;
@@ -22,6 +22,6 @@ export class Inverso extends Expresion{
                 generador.addExpresion(temp, valor.getValor(), -1, '*');
                 return new Retorno(temp, true, valor.tipo);
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede invertir el tipo ${valor.tipo.nombreTipo} * -1`);
+        throw new Error_(this.linea, this.columna, 'Semantico', `No se puede invertir el tipo ${valor.tipo.nombreTipo} * -1`);
     }
 }

@@ -3,7 +3,7 @@ import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Utils/Retorno";
 import { Generador } from "../../Generador/Generador";
 import { Types, Type } from "../../Utils/Type";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { StringL } from '../Literal/String';
 import { PrimitivoL } from '../Literal/Primitivo';
 
@@ -168,6 +168,6 @@ export class Suma extends Expresion {
                         break;
                 }
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede sumar ${izquierda.tipo.nombreTipo} + ${derecha.tipo.nombreTipo}`);
+        throw new Error_(this.linea, this.columna, 'Semantico', `No se puede sumar ${izquierda.tipo.nombreTipo} + ${derecha.tipo.nombreTipo}`);
     }
 }

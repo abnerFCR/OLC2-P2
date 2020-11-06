@@ -3,7 +3,7 @@ import { Expresion } from "../../Abstracto/Expresion";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Types } from "../../Utils/Type";
 import { Generador } from "../../Generador/Generador";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 
 export class Imprimir extends Instruccion {
     private valor: Expresion[];
@@ -16,7 +16,7 @@ export class Imprimir extends Instruccion {
     }
     compilar(entorno:Entorno){
         const generador = Generador.getInstancia();
-        console.log(this.valor);
+        //console.log(this.valor);
         for(let val of this.valor){
             this.traducir(entorno, val);
         }
@@ -43,7 +43,7 @@ export class Imprimir extends Instruccion {
                 generador.addEtiqueta(templabel);
                 break;
             case Types.STRING:
-                console.log(entorno.size);
+                //console.log(entorno.size);
                 generador.addSiguienteEntorno(entorno.size);
                 generador.addSetStack('p', valor.getValor());
                 generador.addCall('nativa_imprimir_string');
@@ -53,7 +53,7 @@ export class Imprimir extends Instruccion {
                 generador.addImprimirNull();
                 break;
             default: 
-                throw new Error(this.linea,this.columna,'Semantico',`No se puede imprimir el tipo de dato ${valor.tipo.nombreTipo}`);
+                throw new Error_(this.linea,this.columna,'Semantico',`No se puede imprimir el tipo de dato ${valor.tipo.nombreTipo}`);
         }
         
     }
@@ -87,7 +87,7 @@ export class Imprimir extends Instruccion {
                 generador.addImprimirNull();
                 break;
             default: 
-                throw new Error(this.linea,this.columna,'Semantico',`No se puede imprimir el tipo de dato ${valor.tipo.nombreTipo}`);
+                throw new Error_(this.linea,this.columna,'Semantico',`No se puede imprimir el tipo de dato ${valor.tipo.nombreTipo}`);
         }
         if(this.esLinea){
             generador.addPrint('c',10);

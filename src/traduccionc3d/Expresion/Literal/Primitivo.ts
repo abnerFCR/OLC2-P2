@@ -3,7 +3,7 @@ import { Type, Types } from "../../Utils/Type";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Utils/Retorno";
 import { Generador } from "../../Generador/Generador";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 
 export class PrimitivoL extends Expresion {
     private tipo: Types;
@@ -13,7 +13,6 @@ export class PrimitivoL extends Expresion {
         super(linea, columna);
         this.tipo = tipo;
         this.valor = valor;
-        console.log(this);
     }
 
     public compilar(entorno: Entorno): Retorno {
@@ -34,7 +33,7 @@ export class PrimitivoL extends Expresion {
             case Types.NULL:
                 return new Retorno('-1',false,new Type(this.tipo));
             default:
-                throw new Error(this.linea,this.columna,'Semantico','Tipo de dato no reconocido');
+                throw new Error_(this.linea,this.columna,'Semantico','Tipo de dato no reconocido');
         }
     }
 }

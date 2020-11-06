@@ -2,7 +2,7 @@ import { Expresion } from "../../Abstracto/Expresion";
 import { Generador } from "../../Generador/Generador";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Utils/Retorno";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Types, Type } from "../../Utils/Type";
 
 export class Division extends Expresion {
@@ -31,6 +31,6 @@ export class Division extends Expresion {
                         break;
                 }
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede dividir ${izquierda.tipo.nombreTipo} / ${derecha.tipo.nombreTipo}`);
+        throw new Error_(this.linea, this.columna, 'Semantico', `No se puede dividir ${izquierda.tipo.nombreTipo} / ${derecha.tipo.nombreTipo}`);
     }
 }

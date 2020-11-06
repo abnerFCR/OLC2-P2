@@ -1,7 +1,7 @@
 import { Expresion } from "../../Abstracto/Expresion";
 import { Generador } from "../../Generador/Generador";
 import { Entorno } from "../../TablaSimbolos/Entorno";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Types, Type } from "../../Utils/Type";
 import { Retorno } from "../../Utils/Retorno";
 
@@ -30,6 +30,6 @@ export class Resta extends Expresion {
                         break;
                 }
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede restar ${izquierda.tipo.nombreTipo} - ${derecha.tipo.nombreTipo}`);
+        throw new Error_(this.linea, this.columna, 'Semantico', `No se puede restar ${izquierda.tipo.nombreTipo} - ${derecha.tipo.nombreTipo}`);
     }
 }

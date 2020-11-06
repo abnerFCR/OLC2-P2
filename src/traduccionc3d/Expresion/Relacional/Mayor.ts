@@ -3,43 +3,43 @@ import { Retorno } from "../../Utils/Retorno";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Types, Type } from "../../Utils/Type";
 import { Generador } from "../../Generador/Generador";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 
-export class Greater extends Expresion{
-    private left: Expresion;
-    private right: Expresion;
-    private isGrtEqual: boolean;
+export class MayorQue extends Expresion{
+    private izquierda: Expresion;
+    private derecha: Expresion;
+    private esMayorIgual: boolean;
 
-    constructor(isGrtEqual: boolean, left: Expresion, right: Expresion, line: number, column: number) {
-        super(line, column);
-        this.left = left;
-        this.right = right;
-        this.isGrtEqual = isGrtEqual; 
+    constructor(esMayorIgual: boolean, izquierda: Expresion, derecha: Expresion, linea: number, columna: number) {
+        super(linea, columna);
+        this.izquierda = izquierda;
+        this.derecha = derecha;
+        this.esMayorIgual = esMayorIgual; 
     }
 
-    compilar(enviorement: Entorno): Retorno {
-        const left = this.left.compilar(enviorement);
-        const right = this.right.compilar(enviorement);
+    compilar(entorno: Entorno): Retorno {
+        const izquierda = this.izquierda.compilar(entorno);
+        const derecha = this.derecha.compilar(entorno);
 
-        const lefType = left.tipo.nombreTipo;
-        const rightType = right.tipo.nombreTipo;
+        const tipoIzquierda = izquierda.tipo.nombreTipo;
+        const tipoDerecha = derecha.tipo.nombreTipo;
 
-        if ((lefType == Types.NUMBER) && (rightType == Types.NUMBER)) {
-            const generator = Generador.getInstancia();
-            this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generator.newEtiqueta() : this.etiquetaVerdadero;
-            this.etiquetaFalso = this.etiquetaFalso == '' ? generator.newEtiqueta() : this.etiquetaFalso;
-            if(this.isGrtEqual){
-                generator.addIf(left.getValor(),right.getValor(),'>=',this.etiquetaVerdadero);
+        if ((tipoIzquierda == Types.NUMBER) && (tipoDerecha == Types.NUMBER)) {
+            const generador = Generador.getInstancia();
+            this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generador.newEtiqueta() : this.etiquetaVerdadero;
+            this.etiquetaFalso = this.etiquetaFalso == '' ? generador.newEtiqueta() : this.etiquetaFalso;
+            if(this.esMayorIgual){
+                generador.addIf(izquierda.getValor(),derecha.getValor(),'>=',this.etiquetaVerdadero);
             }
             else{
-                generator.addIf(left.getValor(),right.getValor(),'>',this.etiquetaVerdadero);
+                generador.addIf(izquierda.getValor(),derecha.getValor(),'>',this.etiquetaVerdadero);
             }
-            generator.addGoto(this.etiquetaFalso);
+            generador.addGoto(this.etiquetaFalso);
             const retorno = new Retorno('',false,new Type(Types.BOOLEAN));
             retorno.etiquetaVerdadero = this.etiquetaVerdadero;
             retorno.etiquetaFalso = this.etiquetaFalso;
             return retorno;
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede ${lefType} > ${rightType}`);
+        throw new Error_(this.linea, this.columna, 'Semantico', `No se puede ${tipoIzquierda} > ${tipoDerecha}`);
     }
 }

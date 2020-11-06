@@ -6,18 +6,47 @@
     const { Inverso } = require('../Expresion/Aritmetico/Inverso');
     const { Residuo } = require('../Expresion/Aritmetico/Residuo');
     const { Multiplicacion } = require('../Expresion/Aritmetico/Multiplicacion');
-    const { IgualIgual } = require('../Expresion/Relacional/Igual');
     const { Division } = require('../Expresion/Aritmetico/Division');
     const { Potencia } = require('../Expresion/Aritmetico/Potencia');
+    
+    const { IgualIgual } = require('../Expresion/Relacional/Igual');
+    const { NoIgual } = require('../Expresion/Relacional/NoIgual');
+    const { MayorQue } = require('../Expresion/Relacional/Mayor');
+    const { MenorQue } = require('../Expresion/Relacional/Menor');
+    const { Ternario } = require('../Expresion/Relacional/Ternario');    
+
+    const { And } = require('../Expresion/Logico/And');
+    const { Or } = require('../Expresion/Logico/Or');
+    const { Not } = require('../Expresion/Logico/Not');
+    
+    const { AccesoId } = require('../Expresion/Acceso/AccesoId');
+    const { AsignacionId } = require('../Expresion/Asignacion/AsignacionId');
+    const { AsignacionFuncion } = require('../Expresion/Asignacion/AsignacionFuncion');
+
+
+    const { If } = require('../Instruccion/Control/If');
+    const { DoWhile } = require('../Instruccion/Control/DoWhile');
+    const { While } = require('../Instruccion/Control/While');
+    const { Statement } = require('../Instruccion/Control/Statement');
+    const { Declaracion } = require('../Instruccion/Variables/Declaracion');
+    const { Asignacion } = require('../Instruccion/Variables/Asignacion');
+    const { Continue } = require('../Instruccion/Transferencia/Continue');
+    const { Break } = require('../Instruccion/Transferencia/Break');
+    const { Return } = require('../Instruccion/Transferencia/Return');
+
     const { Types, Type } = require('../Utils/Type');
     const { PrimitivoL } = require('../Expresion/Literal/Primitivo');
     const { StringL } = require('../Expresion/Literal/String');
+
     const { Imprimir } = require('../Instruccion/Funciones/Imprimir');
+    const { FuncionSt } = require('../Instruccion/Funciones/FuncionSt');
+
+    const { Parametro } = require('../Utils/Parametro');
 
 %}
 
 %lex
-%options case-sensitive
+%options case-insensitive
 number  [0-9]+
 decimal {number}"."{number}
 //string  (\"[^"]*\")
@@ -167,21 +196,21 @@ Instruccion
     {
         $$=$1;
     }
-    |DeclaracionVariable
+    |DeclaracionVariable 
     {
-        
+        $$ = $1;
     }
     |AsignacionVariable ';'
     {
-        
+        $$ = $1;
     }
     |IfSt
     {
-        
+        $$ = $1;
     }
     |WhileSt
     {
-        
+        $$ = $1;
     }
     |DoWhileSt
     {
@@ -189,11 +218,11 @@ Instruccion
     }
     |SwitchSt
     {
-        
+     /*   
     }
     |IncreDecre ';'
     {
-        
+       */ 
     }
     |DefinicionTypes ';'
     {
@@ -205,11 +234,11 @@ Instruccion
     }
     |'BREAK' ';'
     {
-        
+        $$ = new Break(@1.first_line, @1.first_column);
     }
     |'CONTINUE' ';'
     {
-        
+        $$ = new Continue(@1.first_line, @1.first_column);
     }
     |DeclaracionArreglos ';'
     {
@@ -229,7 +258,7 @@ Instruccion
     }
     |Funcion 
     {
-        
+       /* 
     }
     |ID '(' ListaExpr ')' ';'
     {
@@ -241,15 +270,16 @@ Instruccion
     }
     |ID  '=' '{' ListaValoresTipo '}' ';'
     {
-        
+     */   
     }
     |'RETURN' Expr ';'
     {
-        
+        $$ = new Return($2, @1.first_line, @1.first_column);
     }
     |'RETURN' ';'
     {
-        
+        $$ = new Return(null, @1.first_line, @1.first_column);
+    /*    
     }
     |AsigIndividual '=' Expr ';'
     {
@@ -258,7 +288,7 @@ Instruccion
     |AsigIndividual '=' '['']' ';'
     {
         
-    }
+    /*
     |error ';'
     {
         error=new Error_(@1.first_line, @1.first_column, 'Sintactico','El caracter: " ' + yytext + ' ",  no se esperaba');
@@ -269,51 +299,42 @@ Instruccion
         error=new Error_(@1.first_line,@1.first_column, 'Sintactico','El caracter: " ' + yytext + ' ",  no se esperaba');
         errores.push(error);
     }
-    
+    */
+    }
 ;
 
 Funcion
-    :'FUNCTION' ID '(' ListaParametros ')' ':' TiposFuncion StatementFuncion
+    :'FUNCTION' ID '(' ListaParametros ')' TiposFuncion StatementFuncion
     {
-        
+        $$ = new FuncionSt($6,$2,$4,$7,@1.first_line,@1.first_column);  
+                          //(tipo: Type,id: string, parametros: Array<Parametro>, cuerpo: Instruccion, linea: number, columna: number)
     }
-    |'FUNCTION' ID '(' ListaParametros ')' StatementFuncion
+    |'FUNCTION' ID '(' ')' TiposFuncion StatementFuncion
     {
-        
-    }
-    |'FUNCTION' ID '(' ')' ':' TiposFuncion StatementFuncion
-    {
-        
-    }
-    |'FUNCTION' ID '(' ')' StatementFuncion
-    {
-        
+        $$ = new FuncionSt($5,$2,[],$6,@1.first_line,@1.first_column); 
     }
 ;
 
 ListaParametros
-    :ElementoParametro ListaParametrosPrima
+    :ListaParametros ',' ElementoParametro 
     {
-        
+        $1.push($3);
+        $$ = $1;
     }
-;
-
-ListaParametrosPrima
-    : ',' ElementoParametro ListaParametrosPrima
+    |ElementoParametro
     {
-        
+        $$ = [$1];
     }
-    |{}
 ;
 
 ElementoParametro
-    :ElementoDeclaracion
+    :ID Tipo 
     {
-        
+        $$ = new Parametro($1, $2);
     }
-    |ID ':' Tipos ListaCorh
+    |ID  Tipo ListaCorh
     {
-        
+        $$ = new Parametro($1, new Type(Types.ARRAY));
     }
 ;
 
@@ -323,21 +344,20 @@ ListaCorh
 ;
 
 TiposFuncion
-    :TipoNormal
+    :Tipo
     {
-        
+        $$ = $1;
     }
-    |'TIPOVOID'
+    |Tipo ListaCorh
     {
-        
-    }
-    |ID
-    {
-        
-    }
-    |TipoNormal ListaCorh
-    {
-        
+        if($1.nombreTipo != Types.STRUCT)
+        {
+            $$ = new Type(Types.ARRAY, $1.nombreTipo);
+        }
+        else
+        {
+            $$ = new Type(Types.ARRAY, $1.nombreTipo);
+        }
     }
 ;
 
@@ -356,56 +376,77 @@ GraficarTs
 ;
 
 DeclaracionVariable
-    : 'LET' ListaDeclaraciones ';' 
+    : 'LET' ID Tipo ';' 
     {
-        $$= new Declaracion('let', $2, @1.first_line, @1.first_column);
+        $$ =  new Declaracion(false, $3, [$2], null, @1.first_line, @1.first_column);
     }
-    | 'CONST' ListaDeclaraciones ';'
+    | 'LET' ID  Tipo  '=' Expr ';' 
     {
-        $$ = new Declaracion('const',$2, @1.first_line, @1.first_column);
-    }   
+        $$ =  new Declaracion(false, $3, [$2], $5, @1.first_line, @1.first_column);
+    }
+    | 'CONST' ID  Tipo  '=' Expr ';' 
+    {
+        $$ =  new Declaracion(false, $3, [$2], $5, @1.first_line, @1.first_column);
+    }
 ; 
 
+Tipo:
+    |':' 'TIPOSTRING'
+    {
+        $$ = new Type(Types.STRING);
+    }
+    |':' 'TIPOBOOLEAN'
+    {
+        $$ = new Type(Types.BOOLEAN);
+    }
+    |':' 'TIPONUMBER'
+    {
+        $$ = new Type(Types.NUMBER);
+    }
+    |':' ID
+    {
+        $$ = new Type(Types.STRUCT, $2);
+    }
+    |':' 'TIPOVOID'
+    {
+        $$ = new Type(Types.VOID);
+    }
+;
+
 AsignacionVariable
-    : ID '=' Expr 
+    : AsigIndividual '=' Expr 
     {
-        
+        $$ = new Asignacion($1, $3, @1.first_line, @1.first_column);
     }
 ;
 
-IfSt
-    : 'IF' '(' Expr ')' Statement ElseSt
-    {
-        
-    }
-;
 
-ElseSt
-    : 'ELSE' Statement
+IfSt 
+    : 'IF' '(' Expr ')' Statement
     {
-        
+        $$ = new If($3, $5, null, @1.first_line, @1.first_column);
+    }
+    | 'IF' '(' Expr ')' Statement 'ELSE' Statement 
+    {
+        $$ = new If($3, $5, $7, @1.first_line, @1.first_column);
+    }
+    | 'IF' '(' Expr ')' Statement 'ELSE' IfSt 
+    {
+        $$ = new If($3, $5, $7, @1.first_line, @1.first_column);
     } 
-    | 'ELSE' IfSt
-    {
-        
-    }
-    | 
-    {
-            
-    }
 ;
 
 WhileSt
     : 'WHILE' '(' Expr ')' Statement
     {
-        
+        $$ = new While($3, $5, @1.first_line, @1.first_column);
     }
 ;
 
 DoWhileSt
     : 'DO' Statement 'WHILE' '(' Expr ')' ';'
     {
-        
+        $$ = new DoWhile($5,$2,@1.first_line, @1.first_column);
     }
 ;
 
@@ -478,11 +519,23 @@ IncreDecre
 Statement
     : '{' Instrucciones '}' 
     {
-        
+        $$ =  new Statement($2,@1.first_line,@1.first_column);
     }
     | '{' '}' 
     {
-        
+        $$ = new Statement(new Array(), @1.first_line, @1.first_column);
+    }
+;
+
+ListaID :
+    ListaID ',' ID
+    {
+        $1.push($2);
+        $$ = $1;
+    }
+    |ID
+    {
+        $$ = [$1];
     }
 ;
 
@@ -498,15 +551,7 @@ ListaDeclaraciones
 ;
 
 ElementoDeclaracion
-    :ID ':' TipoNormal '=' Expr
-    {
-        
-    }
-    |ID ':' TipoNormal
-    {
-        
-    }
-    |ID ':' ID
+    :ID Tipo '=' Expr
     {
         
     }
@@ -514,11 +559,6 @@ ElementoDeclaracion
     {
 
     }
-    |ID ':' ID '=' Expr
-    {
-
-    }
-    
 ;
 
 
@@ -540,17 +580,6 @@ ValorType
     }
 ;
 
-TipoNormal
-    :'TIPOSTRING'
-    {
-    }
-    |'TIPOBOOLEAN'
-    {
-    }
-    |'TIPONUMBER'
-    {
-    }
-;
 
 DefinicionTypes
     : 'TYPE' ID '=' '{' ListaDefiniciones '}'
@@ -571,11 +600,7 @@ ListaDefiniciones
 ;
 
 DefinicionAtributo
-    :ID ':' ID
-    {
-
-    }
-    |ID ':' TipoNormal
+    :ID ':' Tipo
     {
         
     }
@@ -600,11 +625,11 @@ ListaDimensiones
     :ListaDimensiones '[' ']'
     {   
     } 
-    |'LET' ID ':' Tipos '[' ']'
+    |'LET' ID ':' Tipo '[' ']'
     {
 
     }
-    |'CONST' ID ':' Tipos '[' ']'
+    |'CONST' ID ':' Tipo '[' ']'
     {
 
     }
@@ -645,15 +670,6 @@ ListaExpr
     }
 ;
 
-Tipos
-    :TipoNormal
-    {
-
-    }
-    |ID
-    {
-    }
-;
 
 Expr
     : Expr '+' Expr
@@ -692,24 +708,31 @@ Expr
     }
     | Expr '||' Expr
     {
+        $$ = new Or($1,$3,@1.first_line, @1.first_column);
     }
     | Expr '&&' Expr
-    { 
+    {
+        $$ = new And($1,$3,@1.first_line, @1.first_column); 
     }
     | '!' Expr
     { 
+        $$ = new Not($2, @1.first_line, @1.first_column);
     }   
     | Expr '>=' Expr
     {
+        $$ = new MayorQue(true,$1,$3,@1.first_line,@1.first_column);
     }
     | Expr '<=' Expr
     { 
+        $$ = new MenorQue(true,$1,$3,@1.first_line,@1.first_column);
     }    
     | Expr '>' Expr
     {
+        $$ = new MayorQue(false,$1,$3,@1.first_line,@1.first_column);
     }
     | Expr '<' Expr
     {
+        $$ = new MenorQue(false,$1,$3,@1.first_line,@1.first_column);
     }
     | Expr '==' Expr
     {
@@ -717,6 +740,7 @@ Expr
     }
     | Expr '!=' Expr
     { 
+        $$ = new NoIgual($1,$3,@1.first_line,@1.first_column);
     }
     | F
     {
@@ -767,12 +791,15 @@ F   : '(' Expr ')'
     }
     |ID '(' ListaExpr ')' 
     {
+        $$ = new AsignacionFuncion($1, $3,null,  @1.first_line, @1.first_column);
     }
     |ID '(' ')' 
     {
+        $$ =  new AsignacionFuncion($1, [], null, @1. first_line, @1.first_column);
     }
     | Expr '?' Expr ':' Expr
     {
+        $$ = new Ternario($1, $3, $5, @1.first_line, @1.first_column);
     }
     
 ;
@@ -788,9 +815,11 @@ NuevoAcceso
     {
     }
 ;
+
 Acceso
     :ID
     {
+        $$ = new AccesoId($1, null, @1.first_line, @1.first_column);
     }
 ;
 
@@ -830,70 +859,71 @@ FuncionArreglo
 
 
 AsigIndividual
-    :AsigIndividual '[' Expr ']' 
+    :AsigIndividual '.' ID 
     {
+        $$ = new AsignacionId($3, $1, @1.first_line, @1.first_column);
     }
-    |ID '[' Expr ']'
+    |ID 
     {
-    }
-    |AsigIndividual '.' ID 
-    {
-    }
-    |ID '.' ID
-    {
+        $$ = new AsignacionId($1, null, @1.first_line, @1.first_column);
     }
 ;
 
 StatementFuncion
     : '{' InstruccionesFuncion '}' 
     {
+        $$ = new Statement($2, @1.first_line, @1.first_column);
     }
     | '{' '}' 
     {
+        $$ = new Statement(null, @1.first_line, @1.first_column);
     }
 ;
 
 InstruccionesFuncion
-    :InstruccionFuncion InstruccionesFuncionPrima
+    :InstruccionesFuncion InstruccionFuncion
     {
-        
+        $1.push($2);
+        $$ = $1;
     }
-;
-InstruccionesFuncionPrima
-    :InstruccionFuncion InstruccionesFuncionPrima
-    { 
-    }
-    |
+    |InstruccionFuncion
     {
+        $$ = [$1];
     }
 ;
 
 InstruccionFuncion
     : Imprimir
     {
+        $$ = $1;
     }
     |DeclaracionVariable
     {
+        $$ = $1;
 
     }
     |AsignacionVariable ';'
     {
-        
+        $$ = $1;
     }
     |IfSt
     {
+        $$ = $1;
     }
     |WhileSt
     {
+        $$ = $1;
     }
     |DoWhileSt
     {
+        $$= $1;
     }
     |SwitchSt
-    {
+    {/*
     }
     |IncreDecre ';'
     {
+        */
     }
     |DefinicionTypes ';'
     {
@@ -903,9 +933,11 @@ InstruccionFuncion
     }
     |'BREAK' ';'
     {
+        $$ = new Break(@1.first_line, @1.first_column);
     }
     |'CONTINUE' ';'
     {
+        $$ = new Continue(@1.first_line, @1.first_column);
     }
     |DeclaracionArreglos ';'
     {
@@ -918,6 +950,7 @@ InstruccionFuncion
     }
     |ForIn
     {
+        /*
     }
     |ID  '=' '{' ListaValoresTipo '}' ';'
     {
@@ -927,15 +960,15 @@ InstruccionFuncion
     }
     |ID '('')' ';'
     {
-    }
-    |AsigIndividual '=' Expr ';'
-    {
+        */
     }
     |'RETURN' Expr ';'
-    {
+    {   
+        $$ = new Return($2, @1.first_line, @1.first_column);
     }
     |'RETURN' ';'
     {
+        $$ = new Return(null, @1.first_line, @1.first_column);
     }
     |error ';'
     {
@@ -949,6 +982,7 @@ InstruccionFuncion
     }
     
 ;
+
 ForOf
     :'FOR' '(' 'LET' ID 'OF' Expr')' Statement
     {

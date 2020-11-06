@@ -2,7 +2,7 @@ import { Expresion } from "../../Abstracto/Expresion";
 import { Generador } from "../../Generador/Generador";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Type, Types } from "../../Utils/Type";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Retorno } from "../../Utils/Retorno";
 
 export class Potencia extends Expresion {
@@ -39,6 +39,6 @@ export class Potencia extends Expresion {
                         break;
                 }
         }
-        throw new Error(this.linea, this.columna, 'Semantico', `No se puede modular ${izquierda.tipo.nombreTipo} % ${derecha.tipo.nombreTipo}`);
+        throw new Error_(this.linea, this.columna, 'Semantico', `No se puede modular ${izquierda.tipo.nombreTipo} % ${derecha.tipo.nombreTipo}`);
     }
 }

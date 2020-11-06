@@ -3,7 +3,7 @@ import { SimboloStruct } from "./SimboloStruct";
 import { Simbolo } from "./Simbolo";
 import { Type, Types } from "../Utils/Type";
 import { Error } from "../Utils/Error";
-import { FunctionSt } from "../Instruccion/Funciones/FunctionSt";
+import { FuncionSt } from "../Instruccion/Funciones/FuncionSt";
 import { StructSt } from "../Instruccion/Funciones/StructSt";
 import { Parametro } from "../Utils/Parametro";
 
@@ -50,7 +50,7 @@ export class Entorno {
         return nuevaVariable;
     }
 
-    public addFuncion(funcion: FunctionSt, idUnico: string) : boolean{
+    public addFuncion(funcion: FuncionSt, idUnico: string) : boolean{
         if(this.funciones.has(funcion.id.toLowerCase())){
             return false;
         }

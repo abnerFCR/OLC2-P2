@@ -1,38 +1,38 @@
 import { Expresion } from "../../Abstracto/Expresion"
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Utils/Retorno";
-import { Error } from "../../Utils/Error";
+import { Error_ } from 'src/interprete/Errores/Error';
 import { Generador } from "../../Generador/Generador";
 import { Types } from "../../Utils/Type";
 
 export class AsignacionFuncion extends Expresion{
     private id: string;
     private anterior: Expresion | null;
-    private params: Array<Expresion>;
+    private parametros: Array<Expresion>;
 
     constructor(id: string, params: Array<Expresion>, anterrior: Expresion | null,linea : number, columna: number){
         super(linea,columna);
         this.id = id;
         this.anterior = anterrior;
-        this.params = params;
+        this.parametros = params;
     }
 
-    compilar(enviorement: Entorno) : Retorno{
+    compilar(entorno: Entorno) : Retorno{
         if(this.anterior == null){
-            const symFunc = enviorement.buscarFuncion(this.id);
+            const symFunc = entorno.buscarFuncion(this.id);
             if(symFunc == null)
-                throw new Error(this.linea,this.columna,'Semantico',`No se encontro la funcion: ${this.id}`);
+                throw new Error_(this.linea,this.columna,'Semantico',`No se encontro la funcion: ${this.id}`);
             const paramsValues = new Array<Retorno>();
             const generator = Generador.getInstancia();
-            const size = generator.saveTemps(enviorement); //Guardo temporales
-            this.params.forEach((param)=>{
-                paramsValues.push(param.compilar(enviorement));
+            const size = generator.saveTemps(entorno); //Guardo temporales
+            this.parametros.forEach((param)=>{
+                paramsValues.push(param.compilar(entorno));
             })
             //TODO comprobar parametros correctos
             const temp = generator.newTemporal(); generator.liberarTemporal(temp);
             //Paso de parametros en cambio simulado
             if(paramsValues.length != 0){
-                generator.addExpresion(temp,'p',enviorement.size + 1,'+'); //+1 porque la posicion 0 es para el retorno;
+                generator.addExpresion(temp,'p',entorno.size + 1,'+'); //+1 porque la posicion 0 es para el retorno;
                 paramsValues.forEach((value,index)=>{
                     //TODO paso de parametros booleanos
                     generator.addSetStack(temp,value.getValor());
@@ -41,11 +41,11 @@ export class AsignacionFuncion extends Expresion{
                 });    
             }
 
-            generator.addSiguienteEntorno(enviorement.size);
+            generator.addSiguienteEntorno(entorno.size);
             generator.addCall(symFunc.idUnico);
             generator.addGetStack(temp,'p');
-            generator.addAnteriorEntorno(enviorement.size);
-            generator.recoverTemps(enviorement,size);
+            generator.addAnteriorEntorno(entorno.size);
+            generator.recoverTemps(entorno,size);
             generator.addTemporal(temp);
 
             if (symFunc.tipo.nombreTipo != Types.BOOLEAN) return new Retorno(temp,true,symFunc.tipo);
@@ -62,6 +62,6 @@ export class AsignacionFuncion extends Expresion{
         else{
 
         }
-        throw new Error(this.linea,this.columna,'Semantico','Funcion no implementada');
+        throw new Error_(this.linea,this.columna,'Semantico','Funcion no implementada');
     }
 }
