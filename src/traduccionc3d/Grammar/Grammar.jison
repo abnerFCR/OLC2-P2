@@ -27,7 +27,9 @@
     const { If } = require('../Instruccion/Control/If');
     const { DoWhile } = require('../Instruccion/Control/DoWhile');
     const { While } = require('../Instruccion/Control/While');
+    const { For } = require('../Instruccion/Control/For');
     const { Statement } = require('../Instruccion/Control/Statement');
+
     const { Declaracion } = require('../Instruccion/Variables/Declaracion');
     const { Asignacion } = require('../Instruccion/Variables/Asignacion');
     const { Continue } = require('../Instruccion/Transferencia/Continue');
@@ -218,11 +220,11 @@ Instruccion
     }
     |SwitchSt
     {
-     /*   
+        
     }
     |IncreDecre ';'
     {
-       */ 
+        $$ = $1;
     }
     |DefinicionTypes ';'
     {
@@ -246,7 +248,7 @@ Instruccion
     }
     |ForNormal 
     {
-        
+        $$ = $1;
     }
     |ForOf 
     {
@@ -258,15 +260,17 @@ Instruccion
     }
     |Funcion 
     {
-       /* 
+        $$ = $1;
+       
     }
     |ID '(' ListaExpr ')' ';'
     {
-        
+        $$ = new AsignacionFuncion($1, $3,null,  @1.first_line, @1.first_column);
     }
     |ID '('')' ';'
     {
-        
+        $$ = new AsignacionFuncion($1, [],null,  @1.first_line, @1.first_column);
+        /*
     }
     |ID  '=' '{' ListaValoresTipo '}' ';'
     {
@@ -453,18 +457,18 @@ DoWhileSt
 ForNormal
     :'FOR' '(' DeclaracionVariable Expr ';' OpcAsignacion ')' Statement
     {
-        
+        $$ = new For($3, $4,$6,$8, @1.first_line, @1.first_column);
     }
 ;
 
 OpcAsignacion
     :AsignacionVariable
     {
-        
+        $$ = $1;
     }
     |IncreDecre
     {
-        
+        $$ = $1;
     }
 ;
 
@@ -508,11 +512,19 @@ Caso
 IncreDecre
     : ID '++'
     {   
-        
+        var a = new AsignacionId($1, null, @1.first_line, @1.first_column);
+        var b = new AccesoId($1, null, @1.first_line, @1.first_column);
+        var c = new PrimitivoL(Types.NUMBER, '1', @1.first_line, @1.first_column);
+        var res = new Suma(b,c,@1.first_line, @1.first_column);
+        $$ = new Asignacion(a, res, @1.first_line, @1.first_column);
     }
     |ID '--'
     {
-        
+        var a = new AsignacionId($1, null, @1.first_line, @1.first_column);
+        var b = new AccesoId($1, null, @1.first_line, @1.first_column);
+        var c = new PrimitivoL(Types.NUMBER, '1', @1.first_line, @1.first_column);
+        var res = new Resta(b,c,@1.first_line, @1.first_column);
+        $$ = new Asignacion(a, res, @1.first_line, @1.first_column);
     }
 ;
 
@@ -919,11 +931,11 @@ InstruccionFuncion
         $$= $1;
     }
     |SwitchSt
-    {/*
+    {
     }
     |IncreDecre ';'
     {
-        */
+        $$ = $1;
     }
     |DefinicionTypes ';'
     {
@@ -944,6 +956,7 @@ InstruccionFuncion
     }
     |ForNormal 
     {
+        $$ =$1;
     }
     |ForOf 
     {
@@ -954,13 +967,15 @@ InstruccionFuncion
     }
     |ID  '=' '{' ListaValoresTipo '}' ';'
     {
+        */
     }
     |ID '(' ListaExpr ')' ';'
     {
+        $$ =  new AsignacionFuncion($1, $3, null, @1. first_line, @1.first_column);
     }
     |ID '('')' ';'
     {
-        */
+        $$ =  new AsignacionFuncion($1, [], null, @1. first_line, @1.first_column);
     }
     |'RETURN' Expr ';'
     {   

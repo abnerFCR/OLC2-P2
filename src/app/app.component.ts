@@ -27,7 +27,7 @@ import { StructSt } from 'src/traduccionc3d/Instruccion/Funciones/StructSt';
 export class AppComponent {
 
   title = 'interprete-web';
-  entrada = 'let a:number = 4; \nconsole.log(a);';
+  entrada = 'console.log(!(!(16 == 16 && (false == true)) && !(true)));';
   traduccion = "";
   consola_salida = "";
 

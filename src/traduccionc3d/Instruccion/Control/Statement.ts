@@ -12,7 +12,7 @@ export class Statement extends Instruccion {
 
     compilar(entorno: Entorno): any {
         const newEnv = entorno.actualFunc == null ? new Entorno(entorno) : entorno;
-        console.log(newEnv);
+        //console.log(newEnv);
         this.instrucciones?.forEach((instruction) => {
             try {
                 instruction.compilar(newEnv);
