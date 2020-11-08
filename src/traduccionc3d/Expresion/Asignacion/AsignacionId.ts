@@ -16,23 +16,23 @@ export class AsignacionId extends Expresion {
         this.anterior = anterior;
     }
 
-    compilar(enviorement: Entorno): Retorno {
-        const generator = Generador.getInstancia();
+    compilar(entorno: Entorno): Retorno {
+        const generador = Generador.getInstancia();
         if (this.anterior == null) {
-            const symbol = enviorement.getVariable(this.id);
-            if (symbol == null) throw new Error_(this.linea, this.columna, 'Semantico', `No existe la variable ${this.id}`);
+            const simbolo = entorno.getVariable(this.id);
+            if (simbolo == null) throw new Error_(this.linea, this.columna, 'Semantico', `No existe la variable ${this.id}`);
 
-            if (symbol.isGlobal) {
-                return new Retorno(symbol.posicion + '', false, symbol.tipo, symbol);
+            if (simbolo.isGlobal) {
+                return new Retorno(simbolo.posicion + '', false, simbolo.tipo, simbolo);
             }
             else {
-                const temp = generator.newTemporal();
-                generator.addExpresion(temp, 'p', symbol.posicion, '+');
-                return new Retorno(temp, true, symbol.tipo, symbol);
+                const temp = generador.newTemporal();
+                generador.addExpresion(temp, 'p', simbolo.posicion, '+');
+                return new Retorno(temp, true, simbolo.tipo, simbolo);
             }
         }
         else {
-            const anterior = this.anterior.compilar(enviorement);
+            const anterior = this.anterior.compilar(entorno);
             const symStruct = anterior.tipo.struct;
             if (anterior.tipo.nombreTipo != Types.STRUCT)
                 throw new Error_(this.linea, this.columna, 'Semantico', `Acceso no valido para el tipo ${anterior.tipo.nombreTipo}`);
@@ -41,17 +41,17 @@ export class AsignacionId extends Expresion {
             if (attribute == undefined || attribute.valor == null)
                 throw new Error_(this.linea, this.columna, 'Semantico', `El struct ${symStruct?.id} no tiene el atributo ${this.id}`);
 
-            const tempAux = generator.newTemporal(); generator.liberarTemporal(tempAux);
-            const temp = generator.newTemporal();
+            const tempAux = generador.newTemporal(); generador.liberarTemporal(tempAux);
+            const temp = generador.newTemporal();
             if (anterior.simbolo != null && !anterior.simbolo.isHeap) {
                 //TODO variables por referencia
-                generator.addGetStack(tempAux, anterior.getValor());
+                generador.addGetStack(tempAux, anterior.getValor());
             }
             else {
-                generator.addGetHeap(tempAux, anterior.getValor());
+                generador.addGetHeap(tempAux, anterior.getValor());
             }
 
-            generator.addExpresion(temp,tempAux,attribute.index,'+'); 
+            generador.addExpresion(temp,tempAux,attribute.index,'+'); 
             return new Retorno(temp,true,attribute.valor.tipo,new Simbolo(attribute.valor.tipo,this.id,attribute.index,false,false,true));
         }
     }

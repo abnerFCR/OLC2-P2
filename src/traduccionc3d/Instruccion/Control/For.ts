@@ -23,12 +23,12 @@ export class For extends Instruccion{
     public compilar(entorno: Entorno) {
         let generador = Generador.getInstancia();
         const newEnv = new Entorno(entorno);
-        let declaracion = this.declaracion.compilar(entorno);
+        let declaracion = this.declaracion.compilar(newEnv);
         let etiquetaInicio = generador.newEtiqueta();
 
         generador.addComentario('Inicia For');
         generador.addEtiqueta(etiquetaInicio);
-        let condicion = this.condicion.compilar(entorno);
+        let condicion = this.condicion.compilar(newEnv);
         if(condicion.tipo.nombreTipo == Types.BOOLEAN){
             newEnv.break = condicion.etiquetaFalso;
             newEnv.continue = etiquetaInicio;

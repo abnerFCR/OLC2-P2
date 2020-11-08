@@ -22,6 +22,10 @@
     const { AccesoId } = require('../Expresion/Acceso/AccesoId');
     const { AsignacionId } = require('../Expresion/Asignacion/AsignacionId');
     const { AsignacionFuncion } = require('../Expresion/Asignacion/AsignacionFuncion');
+    const { Length } = require('../Expresion/Funciones/Length');
+    const { CharAt } = require('../Expresion/Funciones/CharAt');
+    const { ToUpperCase } = require('../Expresion/Funciones/ToUpperCase');
+    const { ToLowerCase } = require('../Expresion/Funciones/ToLowerCase');
 
 
     const { If } = require('../Instruccion/Control/If');
@@ -144,6 +148,10 @@ string3 (\`({escape}|{acceptedquote3})*\`)
 ".push"                 return 'PUSH'
 ".pop"                  return 'POP'
 ".length"               return 'LENGTH'
+".ToUpperCase"          return 'UPPERCASE'
+".ToLowerCase"          return 'LOWERCASE'
+'.charAt'               return 'CHARAT'
+'.concat'               return 'CONCAT'
 "."                     return '.'
 
 ([a-zA-Z_])[a-zA-Z0-9_ñÑ]*	return 'ID';
@@ -307,6 +315,18 @@ Instruccion
     }
 ;
 
+FuncionesString
+    : AsigIndividual 'LENGTH' '('')' ';'
+    {
+        $$ =  new Length($1, @1.first_line, @1.first_column);
+    }
+    | AsigIndividual 'TOUPPERCASE' '('')' ';'
+    | AsigIndividual 'TOLOWERCASE' '('')' ';'
+    | AsigIndividual 'CHARAT' '(' Expr ')' ';'
+    | AsigIndividual 'CONCAT' '(' Expr ')' ';'
+
+;
+
 Funcion
     :'FUNCTION' ID '(' ListaParametros ')' TiposFuncion StatementFuncion
     {
@@ -423,7 +443,6 @@ AsignacionVariable
         $$ = new Asignacion($1, $3, @1.first_line, @1.first_column);
     }
 ;
-
 
 IfSt 
     : 'IF' '(' Expr ')' Statement
@@ -573,7 +592,6 @@ ElementoDeclaracion
     }
 ;
 
-
 ListaValoresTipo
     :ListaValoresTipo ',' ValorType
     {
@@ -591,7 +609,6 @@ ValorType
     {
     }
 ;
-
 
 DefinicionTypes
     : 'TYPE' ID '=' '{' ListaDefiniciones '}'
@@ -682,7 +699,6 @@ ListaExpr
     }
 ;
 
-
 Expr
     : Expr '+' Expr
     {
@@ -760,7 +776,6 @@ Expr
     }
 ;
 
-
 F   : '(' Expr ')'
     { 
         $$ = $2;
@@ -817,12 +832,14 @@ F   : '(' Expr ')'
 ;
 
 NuevoAcceso
-    :Accesos
-    {
+    :Acceso
+    {/*
+        $$ = $1;
     }
-    |Acceso
+    |Accesos
     {
-    }
+        $$ = $1;
+    */}
     |ID FuncionArreglo
     {
     }
@@ -833,42 +850,31 @@ Acceso
     {
         $$ = new AccesoId($1, null, @1.first_line, @1.first_column);
     }
+    |Acceso 'LENGTH'
+    {
+        $$ =  new Length($1, @1.first_line, @1.first_column);
+    }
+    |Acceso 'CHARAT' '(' Expr ')'
+    {
+        $$ =  new CharAt($1,$4, @1.first_line, @1.first_column);
+    }
+    |Acceso 'UPPERCASE' '(' ')'
+    {
+        $$ =  new ToUpperCase($1, @1.first_line, @1.first_column);
+    }
+    |Acceso 'LOWERCASE' '(' ')'
+    {
+        $$ =  new ToLowerCase($1, @1.first_line, @1.first_column);
+    }
 ;
 
 Accesos
-    :Accesos '.' ID
+    :Acceso 'LENGTH' '('')' ';'
     {
-    }
-    |Accesos '[' Expr ']'
-    {
-    }
-    |Accesos '[' Expr ']' FuncionArreglo
-    {
-    }
-    |ID '.' ID 
-    {
-    }
-    |ID '[' Expr ']' FuncionArreglo
-    {
-    }
-    |ID '[' Expr ']'
-    {
+        $$ =  new Length($1, @1.first_line, @1.first_column);
     }
     
 ;
-
-FuncionArreglo
-    :'POP' '(' ')' 
-    {
-    }
-    |'PUSH' '(' Expr ')'
-    {
-    }
-    |'LENGTH'
-    {
-    }
-;
-
 
 AsigIndividual
     :AsigIndividual '.' ID 
@@ -938,9 +944,6 @@ InstruccionFuncion
         $$ = $1;
     }
     |DefinicionTypes ';'
-    {
-    }
-    |GraficarTs ';'
     {
     }
     |'BREAK' ';'
