@@ -16,22 +16,25 @@ export class And extends Expresion {
     }
 
     compilar(entorno: Entorno): Retorno {
-        const generator = Generador.getInstancia();
-        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generator.newEtiqueta() : this.etiquetaVerdadero;
-        this.etiquetaFalso = this.etiquetaFalso == '' ? generator.newEtiqueta() : this.etiquetaFalso;
+        const generador = Generador.getInstancia();
+        this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generador.newEtiqueta() : this.etiquetaVerdadero;
+        this.etiquetaFalso = this.etiquetaFalso == '' ? generador.newEtiqueta() : this.etiquetaFalso;
 
-        this.izquierda.etiquetaVerdadero = generator.newEtiqueta();
+        this.izquierda.etiquetaVerdadero = generador.newEtiqueta();
         this.derecha.etiquetaVerdadero = this.etiquetaVerdadero;
         this.izquierda.etiquetaFalso = this.derecha.etiquetaFalso = this.etiquetaFalso;
 
         const izquierda = this.izquierda.compilar(entorno);
-        generator.addEtiqueta(this.izquierda.etiquetaVerdadero);
+        generador.addEtiqueta(this.izquierda.etiquetaVerdadero);
         const derecha = this.derecha.compilar(entorno);
-
+        //console.log('Ejecutando el and');
         if(izquierda.tipo.nombreTipo == Types.BOOLEAN && derecha.tipo.nombreTipo == Types.BOOLEAN){
             const retorno = new Retorno('',false,izquierda.tipo);
             retorno.etiquetaVerdadero = this.etiquetaVerdadero;
             retorno.etiquetaFalso = this.derecha.etiquetaFalso;
+            //console.log('etiquetas');
+            //retorno.etiquetaFalso = izquierda.etiquetaFalso+':\n'+derecha.etiquetaFalso;
+            //retorno.etiquetaVerdadero = derecha.etiquetaVerdadero;
             return retorno;
         }
         throw new Error_(this.linea, this.columna, 'Semantico', `No se puede And: ${izquierda.tipo.nombreTipo} && ${derecha.tipo.nombreTipo}`);

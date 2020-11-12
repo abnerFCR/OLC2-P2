@@ -209,7 +209,7 @@ export class AppComponent {
 
     const ast = parserT.parse(this.entrada);
     let env:Entorno = new Entorno(null);
-    //console.log(env);
+    console.log(ast);
     Generador.getInstancia().limpiarGenerador();
     let nativas  = new Nativas();
     

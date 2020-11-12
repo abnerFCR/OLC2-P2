@@ -22,17 +22,17 @@ export class While extends Instruccion {
         const etiquetaInicioWhile = generador.newEtiqueta();
         generador.addComentario('Inicia While');
         generador.addEtiqueta(etiquetaInicioWhile);
-        const condition = this.condicion.compilar(entorno);
-        if(condition.tipo.nombreTipo == Types.BOOLEAN){
-            newEnv.break = condition.etiquetaFalso;
+        const condicion = this.condicion.compilar(entorno);
+        if(condicion.tipo.nombreTipo == Types.BOOLEAN){
+            newEnv.break = condicion.etiquetaFalso;
             newEnv.continue = etiquetaInicioWhile;
-            generador.addEtiqueta(condition.etiquetaVerdadero);
+            generador.addEtiqueta(condicion.etiquetaVerdadero);
             this.instruccion.compilar(newEnv);
             generador.addGoto(etiquetaInicioWhile);
-            generador.addEtiqueta(condition.etiquetaFalso);
-            generador.addComentario('Finaliza while');
+            generador.addEtiqueta(condicion.etiquetaFalso);
+            generador.addComentario('Finaliza While');
             return;
         }
-        throw new Error_(this.linea,this.columna,'Semantico',`La condicion no es booleana: ${condition?.tipo.nombreTipo}`);
+        throw new Error_(this.linea,this.columna,'Semantico',`La condicion no es booleana: ${condicion?.tipo.nombreTipo}`);
     }
 }

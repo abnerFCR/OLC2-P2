@@ -37,7 +37,6 @@ export class Length extends Expresion {
             generador.addCall('nativa_length');
             generador.addGetStack(temp, 'p');
             generador.addAnteriorEntorno(entorno.size);
-
             return new Retorno(temp, true, new Type(Types.NUMBER));
 
         }

@@ -34,6 +34,7 @@ export class IgualIgual extends Expresion {
                         
                         retorno.etiquetaVerdadero = this.etiquetaVerdadero;
                         retorno.etiquetaFalso = this.etiquetaFalso;
+                        
                         return retorno;
                     default:
                         break;
@@ -46,7 +47,7 @@ export class IgualIgual extends Expresion {
                 this.derecha.etiquetaVerdadero = etiquetaVerdadero;
                 this.derecha.etiquetaFalso = etiquetaFalso;
                 derecha = this.derecha.compilar(entorno);                
-
+                console.log(derecha);
                 generador.addEtiqueta(izquierda.etiquetaFalso);
                 this.derecha.etiquetaVerdadero = etiquetaFalso;
                 this.derecha.etiquetaFalso = etiquetaVerdadero;
@@ -55,9 +56,11 @@ export class IgualIgual extends Expresion {
                     const retorno = new Retorno('',false,izquierda.tipo);
                     retorno.etiquetaVerdadero = etiquetaVerdadero;
                     retorno.etiquetaFalso = etiquetaFalso;
+                    console.log(retorno.etiquetaFalso, retorno.etiquetaVerdadero);
                     return retorno;
                 }
-                break;
+                throw new Error_(this.linea, this.columna, 'Semantico', `No se puede ${izquierda.tipo.nombreTipo} == ${derecha?.tipo.nombreTipo}`);
+                //break;
             case Types.STRING:
                 derecha = this.derecha.compilar(entorno);
                 switch (derecha.tipo.nombreTipo) {

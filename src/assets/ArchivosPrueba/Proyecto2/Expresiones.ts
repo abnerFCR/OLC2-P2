@@ -419,15 +419,23 @@ function figura2(): void {
 function SentenciasAnidadas(): void {
     let numero1: number = 0;
     do {
-        if (numero1 == 0) {
-            figura0(8);
-        } else if (numero1 == 1) {
-            figura1(10);
-        } else if (numero1 == 2) {
-            figura2();
-        } else {
-            console.log("Esto se va a console.log 2 veces :3");
-        }
+        switch (numero1) {
+		  	case 1:{
+            	figura0(8);
+		  		break;
+			}
+			case 2:{
+            	figura1(10);
+				break;
+			}
+		  	case 3:{
+            	figura2();
+			  	break;
+        	} 
+		    default:{
+            	console.log("Esto se va a console.log 2 veces :3");
+            }
+		}
         numero1 = numero1 + 1;
     } while (numero1 < 5);
 }

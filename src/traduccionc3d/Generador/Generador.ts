@@ -206,7 +206,7 @@ export class Generador{
             const temp = this.newTemporal(); this.liberarTemporal(temp);
             let size = 0;
 
-            this.addComentario('Inicia guardado de temporales');
+            this.addComentario('Inicia salvacion de temporales en el stack');
             this.addExpresion(temp,'p',entorno.size,'+');
             this.almacenamientoTemp.forEach((valor)=>{
                 size++;
@@ -214,7 +214,7 @@ export class Generador{
                 if(size !=  this.almacenamientoTemp.size)
                     this.addExpresion(temp,temp,'1','+');
             });
-            this.addComentario('Fin guardado de temporales');
+            this.addComentario('Finalizando salvacion de temporales en el stack');
         }
         let ptr = entorno.size;
         entorno.size = ptr + this.almacenamientoTemp.size;
@@ -227,7 +227,7 @@ export class Generador{
             const temp = this.newTemporal(); this.liberarTemporal(temp);
             let size = 0;
 
-            this.addComentario('Inicia recuperado de temporales');
+            this.addComentario('Inician recuperacion de temporales del stack');
             this.addExpresion(temp,'p',posicion,'+');
             this.almacenamientoTemp.forEach((value)=>{
                 size++;
@@ -235,7 +235,7 @@ export class Generador{
                 if(size !=  this.almacenamientoTemp.size)
                     this.addExpresion(temp,temp,'1','+');
             });
-            this.addComentario('Finaliza recuperado de temporales');
+            this.addComentario('Finaliza la recuperacion de temporales del stack');
             enviorement.size = posicion;
         }
     }

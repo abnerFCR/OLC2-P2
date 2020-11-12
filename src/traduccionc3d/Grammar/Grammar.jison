@@ -26,12 +26,15 @@
     const { CharAt } = require('../Expresion/Funciones/CharAt');
     const { ToUpperCase } = require('../Expresion/Funciones/ToUpperCase');
     const { ToLowerCase } = require('../Expresion/Funciones/ToLowerCase');
-
+    const { Concat } = require('../Expresion/Funciones/Concat');
 
     const { If } = require('../Instruccion/Control/If');
     const { DoWhile } = require('../Instruccion/Control/DoWhile');
     const { While } = require('../Instruccion/Control/While');
     const { For } = require('../Instruccion/Control/For');
+    const { Switch } = require('../Instruccion/Control/Switch');
+    const { Caso } = require('../Utils/Caso');
+    
     const { Statement } = require('../Instruccion/Control/Statement');
 
     const { Declaracion } = require('../Instruccion/Variables/Declaracion');
@@ -300,7 +303,8 @@ Instruccion
     |AsigIndividual '=' '['']' ';'
     {
         
-    /*
+    */
+    }
     |error ';'
     {
         error=new Error_(@1.first_line, @1.first_column, 'Sintactico','El caracter: " ' + yytext + ' ",  no se esperaba');
@@ -311,21 +315,10 @@ Instruccion
         error=new Error_(@1.first_line,@1.first_column, 'Sintactico','El caracter: " ' + yytext + ' ",  no se esperaba');
         errores.push(error);
     }
-    */
+    
     }
 ;
 
-FuncionesString
-    : AsigIndividual 'LENGTH' '('')' ';'
-    {
-        $$ =  new Length($1, @1.first_line, @1.first_column);
-    }
-    | AsigIndividual 'TOUPPERCASE' '('')' ';'
-    | AsigIndividual 'TOLOWERCASE' '('')' ';'
-    | AsigIndividual 'CHARAT' '(' Expr ')' ';'
-    | AsigIndividual 'CONCAT' '(' Expr ')' ';'
-
-;
 
 Funcion
     :'FUNCTION' ID '(' ListaParametros ')' TiposFuncion StatementFuncion
@@ -402,7 +395,14 @@ GraficarTs
 DeclaracionVariable
     : 'LET' ID Tipo ';' 
     {
-        $$ =  new Declaracion(false, $3, [$2], null, @1.first_line, @1.first_column);
+        console.log($3.nombreTipo);
+        console.log(Types.STRING);
+        if($3.nombreTipo == Types.STRING){
+            $$ =  new Declaracion(false, $3, [$2], new StringL(Types.STRING, '', @1.first_line, @1.first_column), @1.first_line, @1.first_column);
+        }else{
+            $$ =  new Declaracion(false, $3, [$2], null, @1.first_line, @1.first_column);
+        }
+        
     }
     | 'LET' ID  Tipo  '=' Expr ';' 
     {
@@ -494,37 +494,38 @@ OpcAsignacion
 SwitchSt
     : 'SWITCH' '(' Expr ')' '{' ListaCasos '}' 
     {
-        
+        $$ = new Switch($3, $6, @1.first_line, @1.first_column);
     }
 ;
 
 ListaCasos
     : ListaCasos Caso 
     {
-        
+        $1.push($2);
+        $$ = $1;
     }
     |Caso 
     {
-        
+        $$ = [$1];
     }
 ;
 
 Caso
     : 'CASE' Expr ':' Statement
     {
-        
+        $$ = new Caso($2, $4,false, @1.first_line, @1.first_column);
     }
     | 'DEFAULT' ':' Statement
     {
-        
+        $$ = new Caso(null, $3,true, @1.first_line, @1.first_column);
     }
     | 'CASE' Expr ':' Instrucciones
     {
-        
+        $$ = new Caso($2, $4,false, @1.first_line, @1.first_column);
     }
     | 'DEFAULT' ':' Instrucciones
     {
-        
+        $$ = new Caso(null, $3,true, @1.first_line, @1.first_column);
     }
 ;
 
@@ -866,6 +867,10 @@ Acceso
     {
         $$ =  new ToLowerCase($1, @1.first_line, @1.first_column);
     }
+    |Acceso 'CONCAT' '(' Expr ')'
+    {
+        $$ =  new Concat($1,$4, @1.first_line, @1.first_column);
+    }
 ;
 
 Accesos
@@ -938,6 +943,7 @@ InstruccionFuncion
     }
     |SwitchSt
     {
+        $$ = $1;
     }
     |IncreDecre ';'
     {
