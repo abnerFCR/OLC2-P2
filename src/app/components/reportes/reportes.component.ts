@@ -24,7 +24,7 @@ export class ReportesComponent implements OnInit {
   private tiposString: string[] = ['NUMBER', 'STRING', 'BOOLEAN', 'NULL', 'ARRAY', 'VOID', 'TYPE'];
   constructor(private router:Router) {
     this.simbolos = cuadro_texto.simbolos;
-    //console.table(this.simbolos);
+    console.table(this.simbolos);
     //console.log("Se termino tambien");
   }
 

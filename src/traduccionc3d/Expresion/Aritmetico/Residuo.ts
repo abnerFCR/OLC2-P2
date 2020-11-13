@@ -4,6 +4,7 @@ import { Generador } from "../../Generador/Generador";
 import { Types, Type } from "../../Utils/Type";
 import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Error_ } from 'src/interprete/Errores/Error';
+import { PrimitivoL } from '../Literal/Primitivo';
 
 export class Residuo extends Expresion{
     private izquierda: Expresion;
@@ -24,6 +25,11 @@ export class Residuo extends Expresion{
             case Types.NUMBER:
                 switch (derecha.tipo.nombreTipo) {
                     case Types.NUMBER:
+                        if(this.derecha instanceof PrimitivoL){
+                            if(this.derecha.valor == 0){
+                                throw new Error_(this.linea, this.columna, 'Semantico', 'No se permite la division entre 0 para el modulo');
+                            }
+                        }
                         generador.addCodigo(`${temp} = fmod(${izquierda.getValor()}, ${derecha.getValor()});`);
                         return new Retorno(temp, true, izquierda.tipo);
                     default:

@@ -4,6 +4,7 @@ import { Entorno } from "../../TablaSimbolos/Entorno";
 import { Retorno } from "../../Utils/Retorno";
 import { Error_ } from 'src/interprete/Errores/Error';
 import { Types, Type } from "../../Utils/Type";
+import { PrimitivoL } from '../Literal/Primitivo';
 
 export class Division extends Expresion {
     private izquierda: Expresion;
@@ -24,7 +25,11 @@ export class Division extends Expresion {
             case Types.NUMBER:
                 switch (derecha.tipo.nombreTipo) {
                     case Types.NUMBER:
-                        //TODO error division entre 0: es posible que se pueda desde la gramatica
+                        if(this.derecha instanceof PrimitivoL){
+                            if(this.derecha.valor == 0){
+                                throw new Error_(this.linea, this.columna, 'Semantico', 'No se permite la division entre 0');
+                            }
+                        }
                         generador.addExpresion(temp, izquierda.getValor(), derecha.getValor(), '/');
                         return new Retorno(temp, true, new Type(Types.NUMBER));
                     default:

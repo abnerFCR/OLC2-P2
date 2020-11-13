@@ -179,7 +179,11 @@ string3 (\`({escape}|{acceptedquote3})*\`)
 %right '**'
 $right '!'
 %left '++' '--'
-
+%left 'LENGTH'
+%left 'CONCAT'
+%left 'CHARAT'
+%left 'UPPERCASE'
+%left 'LOWERCASE'
 
 %start Init
 
@@ -227,21 +231,17 @@ Instruccion
     }
     |DoWhileSt
     {
-        
+        $$=$1;
     }
     |SwitchSt
     {
-        
+        $$ =$1;
     }
     |IncreDecre ';'
     {
         $$ = $1;
     }
     |DefinicionTypes ';'
-    {
-        
-    }
-    |GraficarTs ';'
     {
         
     }
@@ -314,9 +314,7 @@ Instruccion
     {
         error=new Error_(@1.first_line,@1.first_column, 'Sintactico','El caracter: " ' + yytext + ' ",  no se esperaba');
         errores.push(error);
-    }
-    
-    }
+    }  
 ;
 
 
@@ -385,13 +383,6 @@ Imprimir
     }
 ;
 
-GraficarTs
-    :'GRAFICAR_TS' '(' ')'
-    {
-        
-    }
-;
-
 DeclaracionVariable
     : 'LET' ID Tipo ';' 
     {
@@ -410,7 +401,7 @@ DeclaracionVariable
     }
     | 'CONST' ID  Tipo  '=' Expr ';' 
     {
-        $$ =  new Declaracion(false, $3, [$2], $5, @1.first_line, @1.first_column);
+        $$ =  new Declaracion(true, $3, [$2], $5, @1.first_line, @1.first_column);
     }
 ; 
 
@@ -851,27 +842,30 @@ Acceso
     {
         $$ = new AccesoId($1, null, @1.first_line, @1.first_column);
     }
-    |Acceso 'LENGTH'
+    |Expr 'LENGTH'
     {
         $$ =  new Length($1, @1.first_line, @1.first_column);
     }
-    |Acceso 'CHARAT' '(' Expr ')'
+    |Expr 'CHARAT' '(' Expr ')'
     {
+        console.log($2);
         $$ =  new CharAt($1,$4, @1.first_line, @1.first_column);
     }
-    |Acceso 'UPPERCASE' '(' ')'
+    |Expr 'UPPERCASE' '(' ')'
     {
         $$ =  new ToUpperCase($1, @1.first_line, @1.first_column);
     }
-    |Acceso 'LOWERCASE' '(' ')'
+    |Expr 'LOWERCASE' '(' ')'
     {
         $$ =  new ToLowerCase($1, @1.first_line, @1.first_column);
     }
-    |Acceso 'CONCAT' '(' Expr ')'
+    |Expr 'CONCAT' '(' Expr ')'
     {
         $$ =  new Concat($1,$4, @1.first_line, @1.first_column);
     }
 ;
+
+
 
 Accesos
     :Acceso 'LENGTH' '('')' ';'

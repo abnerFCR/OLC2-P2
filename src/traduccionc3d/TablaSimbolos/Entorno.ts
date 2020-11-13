@@ -6,6 +6,7 @@ import { Error } from "../Utils/Error";
 import { FuncionSt } from "../Instruccion/Funciones/FuncionSt";
 import { StructSt } from "../Instruccion/Funciones/StructSt";
 import { Parametro } from "../Utils/Parametro";
+import { cuadro_texto } from 'src/interprete/Abstracto/Retorno';
 
 export class Entorno {
 
@@ -47,6 +48,13 @@ export class Entorno {
         }
         const nuevaVariable = new Simbolo(tipo, id, this.size++, isConst, this.anterior == null, isRef);
         this.variables.set(id, nuevaVariable);
+        /**Para el reporte de simbolos */
+        if(isConst){
+            cuadro_texto.simbolos.push(['Constante',id,tipo.nombreTipo,nuevaVariable.isHeap,isRef,this.getVariable(id).posicion]);
+        }else{
+            cuadro_texto.simbolos.push(['Variable',id,tipo.nombreTipo,nuevaVariable.isHeap, isRef, this.getVariable(id).posicion]);
+        }
+        /**Fin de insertar en el reporte de simbolos */
         return nuevaVariable;
     }
 

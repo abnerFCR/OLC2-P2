@@ -6,7 +6,7 @@
 %}
 
 %lex
-%options case-sensitive
+%options case-insensitive
 number  [0-9]+
 decimal {number}"."{number}
 //string  (\"[^"]*\")
@@ -102,7 +102,12 @@ string3 (\`({escape}|{acceptedquote3})*\`)
 ".push"                 return 'PUSH'
 ".pop"                  return 'POP'
 ".length"               return 'LENGTH'
+".ToUpperCase"          return 'UPPERCASE'
+".ToLowerCase"          return 'LOWERCASE'
+'.charAt'               return 'CHARAT'
+'.concat'               return 'CONCAT'
 "."                     return '.'
+
 
 ([a-zA-Z_])[a-zA-Z0-9_ñÑ]*	return 'ID';
 <<EOF>>		            return 'EOF'
@@ -126,7 +131,11 @@ string3 (\`({escape}|{acceptedquote3})*\`)
 %right '**'
 $right '!'
 %left '++' '--'
-
+%left 'LENGTH'
+%left 'CONCAT'
+%left 'CHARAT'
+%left 'UPPERCASE'
+%left 'LOWERCASE'
 
 %start Init
 
@@ -799,11 +808,7 @@ F   : '(' Expr ')'
 ;
 
 NuevoAcceso
-    :Accesos
-    {
-        $$ = $1;
-    }
-    |Acceso
+    :Acceso
     {
         $$ = $1;
     }
@@ -817,6 +822,26 @@ Acceso
     :ID
     {
         $$ = $1;
+    }
+    |Expr 'LENGTH'
+    {
+        $$ =  $1 + $2;
+    }
+    |Expr 'CHARAT' '(' Expr ')'
+    {
+        $$ = $1+$2+'('+$4+')';
+    }
+    |Expr 'UPPERCASE' '(' ')'
+    {
+        $$ = $1 + $2 +'()';
+    }
+    |Expr 'LOWERCASE' '(' ')'
+    {
+        $$ = $1 + $2 +'()';
+    }
+    |Expr 'CONCAT' '(' Expr ')'
+    {
+        $$ = $1+$2+'('+$4+')';
     }
 ;
 
@@ -856,10 +881,6 @@ FuncionArreglo
     |'PUSH' '(' Expr ')'
     {
         $$ = ".push("+$3+")";
-    }
-    |'LENGTH'
-    {
-        $$ = ".length";
     }
 ;
 

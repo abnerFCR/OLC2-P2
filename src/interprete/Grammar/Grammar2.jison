@@ -41,7 +41,7 @@
 %}
 
 %lex
-%options case-sensitive
+%options case-insensitive
 number  [0-9]+
 decimal {number}"."{number}
 //string  (\"[^"]*\")
@@ -137,6 +137,10 @@ string3 (\`({escape}|{acceptedquote3})*\`)
 ".push"                 return 'PUSH'
 ".pop"                  return 'POP'
 ".length"               return 'LENGTH'
+".ToUpperCase"          return 'UPPERCASE'
+".ToLowerCase"          return 'LOWERCASE'
+'.charAt'               return 'CHARAT'
+'.concat'               return 'CONCAT'
 "."                     return '.'
 
 ([a-zA-Z_])[a-zA-Z0-9_ñÑ]*	return 'ID';
@@ -161,7 +165,11 @@ string3 (\`({escape}|{acceptedquote3})*\`)
 %right '**'
 $right '!'
 %left '++' '--'
-
+%left 'LENGTH'
+%left 'CONCAT'
+%left 'CHARAT'
+%left 'UPPERCASE'
+%left 'LOWERCASE'
 
 %start Init
 
@@ -308,6 +316,14 @@ Instruccion
         $$ = new Nodo("Asig. Indiv.",0);
         $$.add($1);
         $$.add(new Nodo("[]",0));
+    }
+    |error ';'
+    {
+        console.log('Error en la generacion del arbol recuperado');
+    }
+    |error '}'
+    {
+        console.log('Error en la generacion del arbol recuperado');
     }
 ;
 
@@ -1035,12 +1051,7 @@ F   : '(' Expr ')'
 ;
 
 NuevoAcceso
-    :Accesos
-    {
-        $$ = new Nodo("Nuevo Acceso",0);
-        $$.add($1);
-    }
-    |Acceso
+    :Acceso
     {
         $$ = new Nodo("Nuevo Acceso",0);
         $$.add($1);
@@ -1058,6 +1069,38 @@ Acceso
     {
         $$ = new Nodo("Acceso",0);
         $$.add(new Nodo($1,0));
+    }
+    |Expr 'LENGTH'
+    {
+        $$ = new Nodo("Length",0);
+        $$.add($1);
+        
+    }
+    |Expr 'CHARAT' '(' Expr ')'
+    {
+        $$ = new Nodo("charAt",0);
+        $$.add($1);
+        $$.add($4);
+    
+    }
+    |Expr 'UPPERCASE' '(' ')'
+    {
+        $$ = new Nodo("UpperCase",0);
+        $$.add($1);
+    
+    }
+    |Expr 'LOWERCASE' '(' ')'
+    {
+        $$ = new Nodo("LoweCase",0);
+        $$.add($1);
+    
+    }
+    |Expr 'CONCAT' '(' Expr ')'
+    {
+        $$ = new Nodo("Concat",0);
+        $$.add($1);
+        $$.add($4);
+    
     }
 ;
 
@@ -1113,10 +1156,6 @@ FuncionArreglo
         $$ = new Nodo("Push",0);
         $$.add($3);
     }
-    |'LENGTH'
-    {
-        $$ = new Nodo("Length",0);
-    }
 ;
 
 
@@ -1167,6 +1206,7 @@ InstruccionesFuncion
         $$.add($2);
     }
 ;
+
 InstruccionesFuncionPrima
     :InstruccionFuncion InstruccionesFuncionPrima
     {
@@ -1295,6 +1335,14 @@ InstruccionFuncion
         $$ = new Nodo("Asig. Indiv.",0);
         $$.add($1);
         $$.add(new Nodo("[]",0));
+    }
+    |error ';'
+    {
+        console.log('Error en la generacion del arbol recuperado');
+    }
+    |error '}'
+    {
+        console.log('Error en la generacion del arbol recuperado');
     }
 ;
 

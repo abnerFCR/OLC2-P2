@@ -18,7 +18,7 @@ export class NoIgual extends Expresion{
 
     compilar(entorno: Entorno): Retorno {
         const izquierda = this.izquierda.compilar(entorno);
-        const derecha = this.derecha.compilar(entorno);
+        let derecha = this.derecha.compilar(entorno);
         const generador = Generador.getInstancia();
         switch (izquierda.tipo.nombreTipo) {
             case Types.NUMBER:
@@ -118,6 +118,29 @@ export class NoIgual extends Expresion{
                     default:
                         break;
                 }
+            case Types.BOOLEAN:{
+                const etiquetaVerdadero = generador.newEtiqueta();
+                const etiquetaFalso = generador.newEtiqueta();
+
+                generador.addEtiqueta(izquierda.etiquetaVerdadero);
+                this.derecha.etiquetaVerdadero = etiquetaVerdadero;
+                this.derecha.etiquetaFalso = etiquetaFalso;
+                derecha = this.derecha.compilar(entorno);                
+                console.log(derecha);
+                generador.addEtiqueta(izquierda.etiquetaFalso);
+                this.derecha.etiquetaVerdadero = etiquetaFalso;
+                this.derecha.etiquetaFalso = etiquetaVerdadero;
+                derecha = this.derecha.compilar(entorno);
+                if(derecha.tipo.nombreTipo = Types.BOOLEAN){
+                    const retorno = new Retorno('',false,izquierda.tipo);
+                    retorno.etiquetaVerdadero = etiquetaVerdadero;
+                    retorno.etiquetaFalso = etiquetaFalso;
+                    console.log(retorno.etiquetaFalso, retorno.etiquetaVerdadero);
+                    return retorno;
+                }
+                throw new Error_(this.linea, this.columna, 'Semantico', `No se puede ${izquierda.tipo.nombreTipo} == ${derecha?.tipo.nombreTipo}`);
+
+            }
             default:
         }
         throw new Error_(this.linea, this.columna, 'Semantico', `No se puede ${izquierda.tipo.nombreTipo} != ${derecha.tipo.nombreTipo}`);

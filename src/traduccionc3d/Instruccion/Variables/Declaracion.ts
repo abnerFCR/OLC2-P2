@@ -40,14 +40,18 @@ export class Declaracion extends Instruccion {
         this.validarTipo(entorno);
 
         this.listaId.forEach((id)=>{
-            // TODO por referencia es verdadero cuando son arreglos o tipos.  El ultimo parametro de .addVar
+            /*let ref = false;
+            if(this.tipo.nombreTipo == Types.STRING){
+                ref =true;
+            }*/
             const nuevaVariable = entorno.addVar(id,valor.tipo.nombreTipo == Types.NULL ? this.tipo : valor.tipo,this.constante,false);
             if(!nuevaVariable) throw new Error_(this.linea,this.columna,'Semantico',`La variable: ${id} ya existe en este ambito;`);
-        
+            //console.log('Estoy en declaracion', valor.etiquetaVerdadero, this.tipo.nombreTipo, Types.BOOLEAN, );
             if(nuevaVariable.isGlobal){
                 if(this.tipo.nombreTipo == Types.BOOLEAN){
                     const templabel = generador.newEtiqueta();
                     generador.addEtiqueta(valor.etiquetaVerdadero);
+                    //console.log('-->',valor.etiquetaVerdadero);
                     generador.addSetStack(nuevaVariable.posicion,'1');
                     generador.addGoto(templabel);
                     generador.addEtiqueta(valor.etiquetaFalso);
@@ -60,17 +64,20 @@ export class Declaracion extends Instruccion {
             }
             else{
                 const temp = generador.newTemporal(); generador.liberarTemporal(temp);
-                generador.addExpresion(temp,'p',nuevaVariable.posicion,'+');
+                
                 if(this.tipo.nombreTipo == Types.BOOLEAN){
                     const templabel = generador.newEtiqueta();
                     generador.addEtiqueta(valor.etiquetaVerdadero);
+                    generador.addExpresion(temp,'p',nuevaVariable.posicion,'+');
                     generador.addSetStack(temp,'1');
                     generador.addGoto(templabel);
                     generador.addEtiqueta(valor.etiquetaFalso);
+                    generador.addExpresion(temp,'p',nuevaVariable.posicion,'+');
                     generador.addSetStack(temp,'0');
                     generador.addEtiqueta(templabel);
                 }
                 else{
+                    generador.addExpresion(temp,'p',nuevaVariable.posicion,'+');
                     generador.addSetStack(temp,valor.getValor());
                 }
             }

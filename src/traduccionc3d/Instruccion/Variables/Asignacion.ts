@@ -22,6 +22,10 @@ export class Asignacion extends Instruccion {
         const generador = Generador.getInstancia();
         const simbolo = objetivo.simbolo;
 
+        if(objetivo.simbolo.isConst){
+            throw new Error_(this.linea,this.columna,'Semantico','No se puede reasignar el valor de una constante');
+        }
+
         if (!this.mismoTipo(objetivo.tipo, valor.tipo)) {
             throw new Error_(this.linea,this.columna,'Semantico','Tipos de dato diferentes');
         }

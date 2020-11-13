@@ -3,6 +3,7 @@ import { Expresion } from 'src/traduccionc3d/Abstracto/Expresion';
 import { Instruccion } from 'src/traduccionc3d/Abstracto/Instruccion';
 import { Entorno } from 'src/traduccionc3d/TablaSimbolos/Entorno';
 import { Generador } from 'src/traduccionc3d/Generador/Generador';
+import { Error_ } from 'src/interprete/Errores/Error';
 
 
 export class Switch extends Instruccion {
@@ -39,6 +40,9 @@ export class Switch extends Instruccion {
                 generador.addGoto(caso.etiquetaInicio);
             } else {
                 let valorCaso = caso.valor.compilar(entorno);
+                if(valorCaso.tipo.nombreTipo != valorEvaluador.tipo.nombreTipo){
+                    throw new Error_(this.linea, this.columna,'Semantico',`El tipo de dato de cada caso debe ser igual al tipo de dato del evaluador en el switch`);
+                }
                 generador.addIf(valorCaso.getValor(), valorEvaluador.getValor(), '==', caso.etiquetaInicio);
 
             }

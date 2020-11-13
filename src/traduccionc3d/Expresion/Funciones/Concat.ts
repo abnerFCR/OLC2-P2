@@ -67,7 +67,7 @@ export class Concat extends Expresion {
             generador.addSetStack(tempAux, operador2.getValor());
             
             generador.addSiguienteEntorno(entorno.size);
-            generador.addCall('nativa_charAt');
+            generador.addCall('nativa_conca_string_string');
             generador.addGetStack(temp, 'p');
             generador.addAnteriorEntorno(entorno.size);
             return new Retorno(temp, true, new Type(Types.STRING));
@@ -86,7 +86,7 @@ export class Concat extends Expresion {
             generador.addSetStack(tempAux, operador2.getValor());
 
             generador.addSiguienteEntorno(entorno.size);
-            generador.addCall('nativa_charAt');
+            generador.addCall('nativa_conca_string_string');
             generador.addGetStack(temp, 'p');
             generador.addAnteriorEntorno(entorno.size);
             return new Retorno(temp, true, new Type(Types.STRING));

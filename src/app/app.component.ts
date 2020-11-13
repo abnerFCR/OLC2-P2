@@ -116,7 +116,8 @@ export class AppComponent {
     cuadro_texto.salida = "";
     cuadro_texto.simbolos =[];
     const textoTraducido = parser3.parse(this.entrada.toString());
-    
+    this.traduccion = textoTraducido;
+    /*
     const ast = parser.parse(textoTraducido);
 /*
     for(const instr of ast){
@@ -144,7 +145,7 @@ export class AppComponent {
       }
     }
     //console.log(textoTraducido);
-    this.traduccion = textoTraducido;
+    
     //this.imprimirErrores();
 */
   }
@@ -253,6 +254,8 @@ export class AppComponent {
     console.log(Generador.getInstancia().getAlmacenamientoTemp());
     this.txt_c3d = Generador.getInstancia().getCodigo();
     this.imprimirErrores();
+    console.log(Generador.getInstancia().getCodigo());
+    
   }
 
 }
