@@ -40,23 +40,25 @@ export class IgualIgual extends Expresion {
                         break;
                 }
             case Types.BOOLEAN:
-                const etiquetaVerdadero = generador.newEtiqueta();
-                const etiquetaFalso = generador.newEtiqueta();
-
-                generador.addEtiqueta(izquierda.etiquetaVerdadero);
+                const etiquetaVerdadero = this.etiquetaVerdadero =='' ? generador.newEtiqueta(): this.etiquetaVerdadero;
+                const etiquetaFalso = this.etiquetaFalso=='' ? generador.newEtiqueta(): this.etiquetaFalso;
+                                                                            // cuando compilo izquierda me devuelve un goto a la etiqueta de su valor sea V o F
+                generador.addEtiqueta(izquierda.etiquetaVerdadero);         // a;ado la etiqueta verdadero de izquierda 
                 this.derecha.etiquetaVerdadero = etiquetaVerdadero;
                 this.derecha.etiquetaFalso = etiquetaFalso;
-                derecha = this.derecha.compilar(entorno);                
-                console.log(derecha);
-                generador.addEtiqueta(izquierda.etiquetaFalso);
+                derecha = this.derecha.compilar(entorno);                   // cuando compilo derecha me devuelde un goto a la etiqueta de su valor sea V o F
+                
+                generador.addEtiqueta(izquierda.etiquetaFalso);             // a;ado la etiqueta falso de izquierda
                 this.derecha.etiquetaVerdadero = etiquetaFalso;
                 this.derecha.etiquetaFalso = etiquetaVerdadero;
-                derecha = this.derecha.compilar(entorno);
+                
+                derecha = this.derecha.compilar(entorno);                   // aca devuelve el goto contrario de cuando compilamos por primera vez derecha
+                
                 if(derecha.tipo.nombreTipo = Types.BOOLEAN){
                     const retorno = new Retorno('',false,izquierda.tipo);
                     retorno.etiquetaVerdadero = etiquetaVerdadero;
                     retorno.etiquetaFalso = etiquetaFalso;
-                    console.log(retorno.etiquetaFalso, retorno.etiquetaVerdadero);
+                    console.log(retorno);
                     return retorno;
                 }
                 throw new Error_(this.linea, this.columna, 'Semantico', `No se puede ${izquierda.tipo.nombreTipo} == ${derecha?.tipo.nombreTipo}`);

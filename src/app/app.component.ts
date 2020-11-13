@@ -117,75 +117,64 @@ export class AppComponent {
     cuadro_texto.simbolos =[];
     const textoTraducido = parser3.parse(this.entrada.toString());
     this.traduccion = textoTraducido;
-    /*
-    const ast = parser.parse(textoTraducido);
-/*
-    for(const instr of ast){
-      try{
-        if(instr instanceof Funcion){
-          instr.ejecutar(env);
-        }else if(instr instanceof DeclaracionType){
-          instr.ejecutar(env);
-        }
-      }catch{
-        errores.push();
-      }
-    }
-    console.log(env);
 
-    for (const instr of ast) {
-      try {
-        if(instr instanceof Funcion){
-          
-        }else{
-          instr.ejecutar(env);
-        }
-      } catch (error) {
-        errores.push(error);
-      }
-    }
-    //console.log(textoTraducido);
-    
-    //this.imprimirErrores();
-*/
   }
 
   
   public ejecutarTraduccion() {
     cuadro_texto.entrada = this.entrada.toString();
-    cuadro_texto.traducir = "";
     errores.length = 0;
-    const env = new Entorno(null);
     this.consola_salida = "";
     cuadro_texto.salida = "";
     cuadro_texto.simbolos =[];
-    const ast = parser.parse(this.traduccion.toString());
-    /*
+
+    const ast = parserT.parse(this.traduccion);
+    let env:Entorno = new Entorno(null);
+    console.log(ast);
+    Generador.getInstancia().limpiarGenerador();
+    let nativas  = new Nativas();
+    
     for(const instr of ast){
       try{
-        if(instr instanceof Funcion){
-          instr.ejecutar(env);
+        if(instr instanceof FuncionSt || instr instanceof StructSt){
+          instr.compilar(env);
         }
-      }catch{
-        errores.push();
+      }catch(err){
+        errores.push(err);
       }
     }
-    console.log(env);
 
-    for (const instr of ast) {
-      try {
-        if(instr instanceof Funcion){
-          
-        }else{
-          instr.ejecutar(env);
+    Generador.getInstancia().addBegin('main()','void');
+    for(const instr of ast){
+      try{
+        if(!(instr instanceof StructSt) &&  !(instr instanceof FuncionSt)){
+          instr.compilar(env);
         }
-      } catch (error) {
-        errores.push(error);
+      }catch(err){
+        errores.push(err);
       }
     }
-    console.log(env);
+
+    Generador.getInstancia().addReturnVoid();
+    Generador.getInstancia().addEnd();
+    
+    for(const instr of ast){
+      try{
+        if((instr instanceof FuncionSt)){
+          instr.compilar(env);
+        }
+      }catch(err){
+        errores.push(err);
+      }
+    }
+    Generador.getInstancia().addEncabezado();
+    console.log(Generador.getInstancia().getAlmacenamientoTemp());
+    this.txt_c3d = Generador.getInstancia().getCodigo();
     this.imprimirErrores();
-    */
+    console.log(Generador.getInstancia().getCodigo());
+    
+  
+    
   }
 
   public imprimirErrores() {
@@ -214,9 +203,6 @@ export class AppComponent {
     Generador.getInstancia().limpiarGenerador();
     let nativas  = new Nativas();
     
-    //console.log(ast);
-    //TODO ahorita todas las instrucciones caen en main, cuando haga funciones y struct hay que hacer una corrida para meterlas y traducirlas
-    //TODO y otra corrida para traducir todo lo que esta fuera y meterlo en el main 
     for(const instr of ast){
       try{
         if(instr instanceof FuncionSt || instr instanceof StructSt){
@@ -226,7 +212,7 @@ export class AppComponent {
         errores.push(err);
       }
     }
-    //let nuevoEntorno = new Entorno(env);
+
     Generador.getInstancia().addBegin('main()','void');
     for(const instr of ast){
       try{
@@ -258,6 +244,9 @@ export class AppComponent {
     
   }
 
+  public optimizar(){
+
+  }
 }
 
 

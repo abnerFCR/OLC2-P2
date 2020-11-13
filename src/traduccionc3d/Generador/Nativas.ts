@@ -524,7 +524,7 @@ export class Nativas {
         generador.addExpresion(temp1, 'p', 2, '+');
         generador.addGetStack(contador, temp1);
 
-        generador.addExpresion(resultado, 0);
+        generador.addExpresion(resultado, 1);
         generador.addIf(contador, 0, '==', etiquetaSalida);
 
         generador.addExpresion(temp1, 'p', 1, '+');

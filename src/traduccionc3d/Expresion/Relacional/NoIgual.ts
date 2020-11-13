@@ -18,10 +18,11 @@ export class NoIgual extends Expresion{
 
     compilar(entorno: Entorno): Retorno {
         const izquierda = this.izquierda.compilar(entorno);
-        let derecha = this.derecha.compilar(entorno);
+        let derecha;
         const generador = Generador.getInstancia();
         switch (izquierda.tipo.nombreTipo) {
             case Types.NUMBER:
+                derecha = this.derecha.compilar(entorno);
                 switch (derecha.tipo.nombreTipo) {
                     case Types.NUMBER:
                         this.etiquetaVerdadero = this.etiquetaVerdadero == '' ? generador.newEtiqueta() : this.etiquetaVerdadero;
@@ -36,6 +37,7 @@ export class NoIgual extends Expresion{
                         break;
                 }
             case Types.STRING:
+                derecha = this.derecha.compilar(entorno);
                 switch (derecha.tipo.nombreTipo) {
                     case Types.STRING: {
                         const temp = generador.newTemporal();
@@ -72,6 +74,7 @@ export class NoIgual extends Expresion{
                         break;
                 }
             case Types.NULL:
+                derecha = this.derecha.compilar(entorno);
                 switch (derecha.tipo.nombreTipo) {
                     case Types.STRING:
                     case Types.ARRAY:
@@ -89,6 +92,7 @@ export class NoIgual extends Expresion{
                         break;    
                 }
             case Types.STRUCT:
+                derecha = this.derecha.compilar(entorno);
                 switch (derecha.tipo.nombreTipo) {
                     case Types.STRUCT:                    
                     case Types.NULL:
@@ -104,6 +108,7 @@ export class NoIgual extends Expresion{
                         break;
                 }
             case Types.ARRAY:
+                derecha = this.derecha.compilar(entorno);
                 switch (derecha.tipo.nombreTipo) {
                     case Types.ARRAY:                    
                     case Types.NULL:
@@ -119,23 +124,25 @@ export class NoIgual extends Expresion{
                         break;
                 }
             case Types.BOOLEAN:{
-                const etiquetaVerdadero = generador.newEtiqueta();
-                const etiquetaFalso = generador.newEtiqueta();
-
-                generador.addEtiqueta(izquierda.etiquetaVerdadero);
+                const etiquetaVerdadero = this.etiquetaVerdadero =='' ? generador.newEtiqueta(): this.etiquetaFalso;
+                const etiquetaFalso = this.etiquetaFalso=='' ? generador.newEtiqueta(): this.etiquetaVerdadero;
+                                                                            // cuando compilo izquierda me devuelve un goto a la etiqueta de su valor sea V o F
+                generador.addEtiqueta(izquierda.etiquetaVerdadero);         // a;ado la etiqueta verdadero de izquierda 
                 this.derecha.etiquetaVerdadero = etiquetaVerdadero;
                 this.derecha.etiquetaFalso = etiquetaFalso;
-                derecha = this.derecha.compilar(entorno);                
-                console.log(derecha);
-                generador.addEtiqueta(izquierda.etiquetaFalso);
+                derecha = this.derecha.compilar(entorno);                   // cuando compilo derecha me devuelde un goto a la etiqueta de su valor sea V o F
+                
+                generador.addEtiqueta(izquierda.etiquetaFalso);             // a;ado la etiqueta falso de izquierda
                 this.derecha.etiquetaVerdadero = etiquetaFalso;
                 this.derecha.etiquetaFalso = etiquetaVerdadero;
-                derecha = this.derecha.compilar(entorno);
+                
+                derecha = this.derecha.compilar(entorno);                   // aca devuelve el goto contrario de cuando compilamos por primera vez derecha
+                
                 if(derecha.tipo.nombreTipo = Types.BOOLEAN){
                     const retorno = new Retorno('',false,izquierda.tipo);
-                    retorno.etiquetaVerdadero = etiquetaVerdadero;
-                    retorno.etiquetaFalso = etiquetaFalso;
-                    console.log(retorno.etiquetaFalso, retorno.etiquetaVerdadero);
+                    retorno.etiquetaVerdadero = etiquetaFalso;
+                    retorno.etiquetaFalso = etiquetaVerdadero;
+                    console.log(retorno);
                     return retorno;
                 }
                 throw new Error_(this.linea, this.columna, 'Semantico', `No se puede ${izquierda.tipo.nombreTipo} == ${derecha?.tipo.nombreTipo}`);
