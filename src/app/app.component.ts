@@ -32,9 +32,9 @@ export class AppComponent {
   traduccion = "";
   consola_salida = "";
 
-  txt_c3d="";
-  txt_c3d_optimizado="";
-  constructor(private router:Router){
+  txt_c3d = "";
+  txt_c3d_optimizado = "";
+  constructor(private router: Router) {
 
   }
   options_entrada: any = {
@@ -70,14 +70,14 @@ export class AppComponent {
     styleActiveLine: true
   };
 
-  
+
   public ejecutar() {
     cuadro_texto.entrada = this.entrada.toString();
     errores.length = 0;
     const env = new Entorno(null);
     this.consola_salida = "";
     cuadro_texto.salida = "";
-    cuadro_texto.simbolos =[];
+    cuadro_texto.simbolos = [];
     const ast = parser.parse(this.entrada.toString());
     /*
     for(const instr of ast){
@@ -107,64 +107,64 @@ export class AppComponent {
     */
   }
 
-  public traducir(){
-    
+  public traducir() {
+
     cuadro_texto.entrada = this.entrada.toString();
     errores.length = 0;
     const env = new Entorno(null);
     this.consola_salida = "";
     cuadro_texto.traducir = "";
     cuadro_texto.salida = "";
-    cuadro_texto.simbolos =[];
+    cuadro_texto.simbolos = [];
     const textoTraducido = parser3.parse(this.entrada.toString());
     this.traduccion = textoTraducido;
 
   }
 
-  
+
   public ejecutarTraduccion() {
     cuadro_texto.entrada = this.entrada.toString();
     errores.length = 0;
     this.consola_salida = "";
     cuadro_texto.salida = "";
-    cuadro_texto.simbolos =[];
+    cuadro_texto.simbolos = [];
 
     const ast = parserT.parse(this.traduccion);
-    let env:Entorno = new Entorno(null);
+    let env: Entorno = new Entorno(null);
     console.log(ast);
     Generador.getInstancia().limpiarGenerador();
-    let nativas  = new Nativas();
-    
-    for(const instr of ast){
-      try{
-        if(instr instanceof FuncionSt || instr instanceof StructSt){
+    let nativas = new Nativas();
+
+    for (const instr of ast) {
+      try {
+        if (instr instanceof FuncionSt || instr instanceof StructSt) {
           instr.compilar(env);
         }
-      }catch(err){
+      } catch (err) {
         errores.push(err);
       }
     }
 
-    Generador.getInstancia().addBegin('main()','void');
-    for(const instr of ast){
-      try{
-        if(!(instr instanceof StructSt) &&  !(instr instanceof FuncionSt)){
+    Generador.getInstancia().addBegin('main()', 'void');
+    for (const instr of ast) {
+      try {
+        if (!(instr instanceof StructSt) && !(instr instanceof FuncionSt)) {
           instr.compilar(env);
         }
-      }catch(err){
+      } catch (err) {
         errores.push(err);
       }
     }
 
     Generador.getInstancia().addReturnVoid();
     Generador.getInstancia().addEnd();
-    
-    for(const instr of ast){
-      try{
-        if((instr instanceof FuncionSt)){
+
+    for (const instr of ast) {
+      try {
+        if ((instr instanceof FuncionSt)) {
           instr.compilar(env);
         }
-      }catch(err){
+      } catch (err) {
         errores.push(err);
       }
     }
@@ -173,9 +173,9 @@ export class AppComponent {
     this.txt_c3d = Generador.getInstancia().getCodigo();
     this.imprimirErrores();
     console.log(Generador.getInstancia().getCodigo());
-    
-  
-    
+
+
+
   }
 
   public imprimirErrores() {
@@ -187,53 +187,53 @@ export class AppComponent {
     this.consola_salida = this.consola_salida + cuadro_texto.salida;
   }
 
-  public reportes(){
+  public reportes() {
     this.router.navigate(['/reportes']);
   }
 
-  public generarC3D(){
+  public generarC3D() {
     cuadro_texto.entrada = this.entrada.toString();
     errores.length = 0;
     this.consola_salida = "";
     cuadro_texto.salida = "";
-    cuadro_texto.simbolos =[];
+    cuadro_texto.simbolos = [];
 
     const ast = parserT.parse(this.entrada);
-    let env:Entorno = new Entorno(null);
+    let env: Entorno = new Entorno(null);
     console.log(ast);
     Generador.getInstancia().limpiarGenerador();
-    let nativas  = new Nativas();
-    
-    for(const instr of ast){
-      try{
-        if(instr instanceof FuncionSt || instr instanceof StructSt){
+    let nativas = new Nativas();
+
+    for (const instr of ast) {
+      try {
+        if (instr instanceof FuncionSt || instr instanceof StructSt) {
           instr.compilar(env);
         }
-      }catch(err){
+      } catch (err) {
         errores.push(err);
       }
     }
 
-    Generador.getInstancia().addBegin('main()','void');
-    for(const instr of ast){
-      try{
-        if(!(instr instanceof StructSt) &&  !(instr instanceof FuncionSt)){
+    Generador.getInstancia().addBegin('main()', 'void');
+    for (const instr of ast) {
+      try {
+        if (!(instr instanceof StructSt) && !(instr instanceof FuncionSt)) {
           instr.compilar(env);
         }
-      }catch(err){
+      } catch (err) {
         errores.push(err);
       }
     }
 
     Generador.getInstancia().addReturnVoid();
     Generador.getInstancia().addEnd();
-    
-    for(const instr of ast){
-      try{
-        if((instr instanceof FuncionSt)){
+
+    for (const instr of ast) {
+      try {
+        if ((instr instanceof FuncionSt)) {
           instr.compilar(env);
         }
-      }catch(err){
+      } catch (err) {
         errores.push(err);
       }
     }
@@ -242,17 +242,21 @@ export class AppComponent {
     this.txt_c3d = Generador.getInstancia().getCodigo();
     this.imprimirErrores();
     console.log(Generador.getInstancia().getCodigo());
-    
+
   }
 
-  public optimizar(){
+  public optimizar() {
     let optimizador = new Optimizador();
+    this.consola_salida = "";
+    cuadro_texto.salida = "";
 
-    this.txt_c3d_optimizado=optimizador.regla1(Generador.getInstancia().codigo).join('\n');
-    this.txt_c3d_optimizado=optimizador.regla34(Generador.getInstancia().codigo).join('\n');
-    
-    //this.txt_c3d_optimizado = optimizador.regla34(this.txt_c3d.split('\n')).join('\n');
+    this.txt_c3d_optimizado = optimizador.regla1(Generador.getInstancia().codigo).join('\n');
+    this.txt_c3d_optimizado = optimizador.regla34(Generador.getInstancia().codigo).join('\n');
+    this.txt_c3d_optimizado = optimizador.reglas6_16(Generador.getInstancia().codigo).join('\n');
+
+    //this.txt_c3d_optimizado = optimizador.reglas6_16(this.txt_c3d.split('\n')).join('\n');
     console.log(this.txt_c3d_optimizado);
+    this.imprimirErrores();
   }
 }
 
