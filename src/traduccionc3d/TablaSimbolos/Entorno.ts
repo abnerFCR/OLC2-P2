@@ -63,6 +63,11 @@ export class Entorno {
             return false;
         }
         this.funciones.set(funcion.id.toLowerCase(),new SimboloFuncion(funcion,idUnico));
+        /**Para el reporte de simbolos */
+        cuadro_texto.simbolos.push(['Funcion',funcion.id,funcion.tipo.nombreTipo,false,false,'Global']);
+
+        /**Fin de insertar en el reporte de simbolos */
+
         return true;
     }
 
