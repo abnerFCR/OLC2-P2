@@ -17,6 +17,7 @@ import { Entorno } from 'src/traduccionc3d/TablaSimbolos/Entorno';
 import { FuncionSt } from 'src/traduccionc3d/Instruccion/Funciones/FuncionSt';
 import { Declaracion } from 'src/traduccionc3d/Instruccion/Variables/Declaracion';
 import { StructSt } from 'src/traduccionc3d/Instruccion/Funciones/StructSt';
+import { Optimizador } from 'src/traduccionc3d/Optimizacion/Optimizador';
 
 @Component({
   selector: 'app-root',
@@ -245,7 +246,13 @@ export class AppComponent {
   }
 
   public optimizar(){
+    let optimizador = new Optimizador();
 
+    this.txt_c3d_optimizado=optimizador.regla1(Generador.getInstancia().codigo).join('\n');
+    this.txt_c3d_optimizado=optimizador.regla34(Generador.getInstancia().codigo).join('\n');
+    
+    //this.txt_c3d_optimizado = optimizador.regla34(this.txt_c3d.split('\n')).join('\n');
+    console.log(this.txt_c3d_optimizado);
   }
 }
 
