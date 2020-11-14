@@ -84,7 +84,7 @@ function multiplicacion(a : number, b : number) : number{
     return a + multiplicacion(a, b - 1);
 }
 
-function menu() {
+function menu():void {
     console.log(fibonacci(13));  // 233
     hanoi(3, 1, 2, 3);
     console.log(ackermann(3, 7)); //1021
