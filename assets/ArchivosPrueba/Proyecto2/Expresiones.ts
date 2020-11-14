@@ -193,7 +193,7 @@ function logicas2(): void {
     let n0: number = 16;
     console.log("==============logicas2=============");
 
-    if (true) {
+    if (!(!(16 == 16 && (false == true)) && !(true))) {
         console.log("Not y Ands Correctos");
         punteo = punteo + 3;
 
